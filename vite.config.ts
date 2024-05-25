@@ -19,8 +19,8 @@ import VueI18n from '@intlify/unplugin-vue-i18n/vite'
 import { projectTitle } from './src/config'
 import { antdvStyleDeps } from './src/utils/resolvers'
 
-const serverAddress = 'http://admin.ballcat.cn'
-// const serverAddress = 'http://127.0.0.1:8080'
+// const serverAddress = 'http://admin.ballcat.cn'
+const serverAddress = 'http://127.0.0.1:8080'
 
 // https://vitejs.dev/config/
 export default defineConfig({
