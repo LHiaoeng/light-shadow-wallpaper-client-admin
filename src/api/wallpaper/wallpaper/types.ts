@@ -16,6 +16,8 @@ export interface WallpaperDTO {
   url: string
   // 壁纸默认地址
   urlBase: string
+  // 预览海报
+  poster: string
   // 版权信息
   copyright: string
   // 版权信息链接
@@ -26,6 +28,8 @@ export interface WallpaperDTO {
   source: number
   // 上架时间
   launchTime: string
+  // 壁纸状态(0-启用，1-停用)
+  status: number
 }
 
 export interface WallpaperQO {
@@ -41,6 +45,8 @@ export interface WallpaperQO {
   url?: string
   // 壁纸默认地址
   urlBase?: string
+  // 预览海报
+  poster: string
   // 版权信息
   copyright?: string
   // 版权信息链接
@@ -49,6 +55,8 @@ export interface WallpaperQO {
   description?: string
   // 壁纸来源(0-默认未知,1-英雄联盟,2-必应)
   source?: number
+  // 状态(0-启用，1-停用)
+  status?: number
   // 上架时间
   launchTime?: string
   // 创建时间

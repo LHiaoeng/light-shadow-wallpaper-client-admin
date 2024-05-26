@@ -7,7 +7,22 @@
             <a-input v-model:value="formModel.title" placeholder="请输入标题" />
           </a-form-item>
         </a-col>
-        <a-col :xl="8" :md="12" :sm="24">
+        <a-col :xl="6" :md="12" :sm="24">
+          <a-form-item label="类型">
+            <dict-select v-model:value="formModel.type" dict-code="wallpaper_type" />
+          </a-form-item>
+        </a-col>
+        <a-col :xl="6" :md="12" :sm="24">
+          <a-form-item label="来源">
+            <dict-select v-model:value="formModel.source" dict-code="wallpaper_source" />
+          </a-form-item>
+        </a-col>
+        <a-col :xl="6" :md="12" :sm="24">
+          <a-form-item label="状态">
+            <dict-select v-model:value="formModel.status" dict-code="wallpaper_status" />
+          </a-form-item>
+        </a-col>
+        <a-col :xl="6" :md="12" :sm="24">
           <search-actions :loading="props.loading" @search="search" @reset="reset" />
         </a-col>
       </a-row>
@@ -18,6 +33,8 @@
 <script setup lang="ts">
 import { Form } from 'ant-design-vue'
 import type { WallpaperQO } from '@/api/wallpaper/wallpaper/types'
+import SearchActions from '@/components/Search/SearchActions.vue'
+import { DictSelect } from '@/components/Dict'
 
 const useForm = Form.useForm
 
@@ -36,7 +53,10 @@ const emits = defineEmits<{
 }>()
 
 const formModel = reactive<WallpaperQO>({
-  title: ''
+  title: '',
+  type: undefined,
+  source: undefined,
+  status: undefined
 })
 
 const { resetFields } = useForm(formModel)

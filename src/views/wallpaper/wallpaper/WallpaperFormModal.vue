@@ -28,6 +28,9 @@
       <a-form-item label="壁纸默认地址">
         <a-input v-model:value="formModel.urlBase" placeholder="请输入" />
       </a-form-item>
+      <a-form-item label="预览海报地址">
+        <a-input v-model:value="formModel.poster" placeholder="请输入预览海报地址" />
+      </a-form-item>
       <a-form-item label="版权信息">
         <a-input v-model:value="formModel.copyright" placeholder="请输入" />
       </a-form-item>
@@ -35,10 +38,13 @@
         <a-input v-model:value="formModel.copyrightLink" placeholder="请输入" />
       </a-form-item>
       <a-form-item label="壁纸描述">
-        <a-input v-model:value="formModel.description" placeholder="请输入" />
+        <a-textarea v-model:value="formModel.description" placeholder="请输入壁纸描述" auto-size />
       </a-form-item>
       <a-form-item label="壁纸来源">
         <dict-select v-model:value="formModel.source" dict-code="wallpaper_source" />
+      </a-form-item>
+      <a-form-item label="壁纸状态">
+        <dict-select v-model:value="formModel.status" dict-code="wallpaper_status" />
       </a-form-item>
       <a-form-item label="上架时间">
         <a-date-picker
@@ -59,6 +65,7 @@ import type { WallpaperDTO, WallpaperPageVO } from '@/api/wallpaper/wallpaper/ty
 import { createWallpaper, updateWallpaper } from '@/api/wallpaper/wallpaper'
 import { overrideProperties } from '@/utils/bean-utils'
 import type { ColProps } from 'ant-design-vue'
+import { DictSelect } from '@/components/Dict'
 
 const labelCol: ColProps = {
   sm: { span: 24 },
@@ -87,21 +94,25 @@ const formModel = reactive<WallpaperDTO>({
   // 壁纸标题
   title: '',
   // 标题链接
-  titleLink: undefined,
+  titleLink: '',
   // 壁纸网址
-  url: undefined,
+  url: '',
   // 壁纸默认地址
-  urlBase: undefined,
+  urlBase: '',
+  // 预览海报
+  poster: '',
   // 版权信息
-  copyright: undefined,
+  copyright: '',
   // 版权信息链接
-  copyrightLink: undefined,
+  copyrightLink: '',
   // 壁纸描述
-  description: undefined,
+  description: '',
   // 壁纸来源(0-默认未知,1-英雄联盟,2-必应)
   source: 0,
   // 上架时间
-  launchTime: undefined
+  launchTime: '',
+  // 壁纸状态(0-启用,1-停用)
+  status: 0
 })
 
 // 表单的校验规则

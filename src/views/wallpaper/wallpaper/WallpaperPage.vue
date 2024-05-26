@@ -4,7 +4,7 @@
 
   <pro-table
     ref="tableRef"
-    header-title="壁纸"
+    header-title="壁纸管理"
     row-key="id"
     :request="tableRequest"
     :columns="columns"
@@ -17,6 +17,14 @@
 
     <!-- 数据表格区域 -->
     <template #bodyCell="{ column, record }">
+      <template v-if="column.key === 'url'">
+        <a-button type="text" title="复制壁纸网址" @click="copyToClipboard(record.url)"
+          ><template #icon><copy-outlined /></template
+        ></a-button>
+        <a :href="record.url" :target="'_blank'" :title="record.url">
+          {{ record.url }}
+        </a>
+      </template>
       <template v-if="column.key === 'operate'">
         <operation-group>
           <a v-if="hasPermission('wallpaper:wallpaper:edit')" @click="handleEdit(record)">编辑</a>
@@ -47,6 +55,9 @@ import { doRequest } from '@/utils/axios/request'
 import { pageWallpaper, deleteWallpaper } from '@/api/wallpaper/wallpaper'
 import type { WallpaperPageVO, WallpaperQO } from '@/api/wallpaper/wallpaper/types'
 import { FormAction } from '@/hooks/form'
+import { DictText } from '@/components/Dict'
+import dayjs from 'dayjs'
+import { message } from 'ant-design-vue'
 
 defineOptions({ name: 'WallpaperPage' })
 
@@ -95,14 +106,49 @@ const handleDelete = (record: WallpaperPageVO) => {
   })
 }
 
+const copyToClipboard = text => {
+  const el = document.createElement('textarea')
+  el.value = text
+  document.body.appendChild(el)
+  el.select()
+  document.execCommand('copy')
+  document.body.removeChild(el)
+  message.success('复制成功')
+}
+
 const columns: ProColumns[] = [
   {
-    title: '#',
-    dataIndex: 'id'
+    title: '序号',
+    dataIndex: 'id',
+    width: 80,
+    align: 'center',
+    fixed: 'left',
+    customRender: function ({ index }) {
+      return index + 1
+    }
   },
   {
     title: '壁纸类型',
-    dataIndex: 'type'
+    dataIndex: 'type',
+    width: 80,
+    customRender: function ({ value }) {
+      return h(DictText, { dictCode: 'wallpaper_type', value: value })
+    }
+  },
+  {
+    title: '壁纸来源',
+    dataIndex: 'source',
+    width: 100,
+    customRender: function ({ value }) {
+      return h(DictText, { dictCode: 'wallpaper_source', value: value })
+    }
+  },
+  {
+    title: '壁纸状态',
+    dataIndex: 'status',
+    customRender: function ({ value }) {
+      return h(DictText, { dictCode: 'wallpaper_status', value: value })
+    }
   },
   {
     title: '壁纸标题',
@@ -110,11 +156,13 @@ const columns: ProColumns[] = [
   },
   {
     title: '标题链接',
-    dataIndex: 'titleLink'
+    dataIndex: 'titleLink',
+    ellipsis: true
   },
   {
     title: '壁纸网址',
-    dataIndex: 'url'
+    dataIndex: 'url',
+    ellipsis: true
   },
   {
     title: '壁纸默认地址',
@@ -126,19 +174,22 @@ const columns: ProColumns[] = [
   },
   {
     title: '版权信息链接',
-    dataIndex: 'copyrightLink'
+    dataIndex: 'copyrightLink',
+    ellipsis: true
   },
   {
     title: '壁纸描述',
-    dataIndex: 'description'
-  },
-  {
-    title: '壁纸来源',
-    dataIndex: 'source'
+    dataIndex: 'description',
+    ellipsis: true
   },
   {
     title: '上架时间',
-    dataIndex: 'launchTime'
+    dataIndex: 'launchTime',
+    width: 100,
+    sorter: true,
+    customRender: function ({ value }) {
+      return value ? dayjs(value).format('YYYY-MM-DD') : ''
+    }
   },
   {
     title: '创建时间',
