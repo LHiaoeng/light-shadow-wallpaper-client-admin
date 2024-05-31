@@ -1,12 +1,7 @@
 <template>
   <a-form :model="modelRef">
     <a-form-item v-bind="validateInfos.username">
-      <a-input
-        v-model:value="modelRef.username"
-        size="large"
-        placeholder="账号: admin"
-        @press-enter="trySubmit"
-      >
+      <a-input v-model:value="modelRef.username" size="large" @press-enter="trySubmit">
         <template #prefix>
           <user-outlined :style="{ color: 'rgba(0,0,0,.25)' }" />
         </template>
@@ -17,7 +12,6 @@
       <a-input-password
         v-model:value="modelRef.password"
         size="large"
-        placeholder="密码: a123456"
         autocomplete="on"
         @press-enter="trySubmit"
       >

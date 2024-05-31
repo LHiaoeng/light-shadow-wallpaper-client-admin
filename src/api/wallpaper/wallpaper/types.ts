@@ -30,6 +30,8 @@ export interface WallpaperDTO {
   launchTime: string
   // 壁纸状态(0-启用，1-停用)
   status: number
+  // 必应壁纸所属地区
+  bingCountry: ''
 }
 
 export interface WallpaperQO {

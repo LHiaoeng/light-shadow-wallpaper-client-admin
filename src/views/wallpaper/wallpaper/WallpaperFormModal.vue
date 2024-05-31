@@ -16,6 +16,15 @@
       <a-form-item label="壁纸类型">
         <dict-select v-model:value="formModel.type" dict-code="wallpaper_type" />
       </a-form-item>
+      <a-form-item label="壁纸来源">
+        <dict-select v-model:value="formModel.source" dict-code="wallpaper_source" />
+      </a-form-item>
+      <a-form-item label="必应壁纸所属地区">
+        <a-input v-model:value="formModel.bingCountry" />
+      </a-form-item>
+      <a-form-item label="壁纸状态">
+        <dict-select v-model:value="formModel.status" dict-code="wallpaper_status" />
+      </a-form-item>
       <a-form-item label="壁纸标题">
         <a-input v-model:value="formModel.title" placeholder="请输入" />
       </a-form-item>
@@ -40,12 +49,7 @@
       <a-form-item label="壁纸描述">
         <a-textarea v-model:value="formModel.description" placeholder="请输入壁纸描述" auto-size />
       </a-form-item>
-      <a-form-item label="壁纸来源">
-        <dict-select v-model:value="formModel.source" dict-code="wallpaper_source" />
-      </a-form-item>
-      <a-form-item label="壁纸状态">
-        <dict-select v-model:value="formModel.status" dict-code="wallpaper_status" />
-      </a-form-item>
+
       <a-form-item label="上架时间">
         <a-date-picker
           v-model:value="formModel.launchTime"
@@ -102,17 +106,19 @@ const formModel = reactive<WallpaperDTO>({
   // 预览海报
   poster: '',
   // 版权信息
-  copyright: '',
+  copyright: '英雄联盟',
   // 版权信息链接
-  copyrightLink: '',
+  copyrightLink: 'https://lol.qq.com/',
   // 壁纸描述
   description: '',
   // 壁纸来源(0-默认未知,1-英雄联盟,2-必应)
-  source: 0,
+  source: 1,
   // 上架时间
   launchTime: '',
   // 壁纸状态(0-启用,1-停用)
-  status: 0
+  status: 0,
+  // 必应壁纸所属地区
+  bingCountry: ''
 })
 
 // 表单的校验规则
