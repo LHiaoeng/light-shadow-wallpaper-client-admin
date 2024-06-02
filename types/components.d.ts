@@ -112,6 +112,7 @@ declare module '@vue/runtime-core' {
     TaobaoOutlined: typeof import('@ant-design/icons-vue')['TaobaoOutlined']
     UploadOutlined: typeof import('@ant-design/icons-vue')['UploadOutlined']
     UpOutlined: typeof import('@ant-design/icons-vue')['UpOutlined']
+    UrlCell: typeof import('./../src/components/UrlCell/index.vue')['default']
     UserOutlined: typeof import('@ant-design/icons-vue')['UserOutlined']
     WeiboOutlined: typeof import('@ant-design/icons-vue')['WeiboOutlined']
     WordClickCaptcha: typeof import('./../src/components/Captcha/WordClickCaptcha.vue')['default']

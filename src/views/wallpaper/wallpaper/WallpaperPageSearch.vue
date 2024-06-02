@@ -8,6 +8,11 @@
           </a-form-item>
         </a-col>
         <a-col :xl="6" :md="12" :sm="24">
+          <a-form-item label="壁纸网址">
+            <dict-select v-model:value="formModel.hasMainUrl" dict-code="content_flag" />
+          </a-form-item>
+        </a-col>
+        <a-col :xl="6" :md="12" :sm="24">
           <a-form-item label="类型">
             <dict-select v-model:value="formModel.type" dict-code="wallpaper_type" />
           </a-form-item>
@@ -20,6 +25,11 @@
         <a-col :xl="6" :md="12" :sm="24">
           <a-form-item label="状态">
             <dict-select v-model:value="formModel.status" dict-code="wallpaper_status" />
+          </a-form-item>
+        </a-col>
+        <a-col :xl="6" :md="12" :sm="24">
+          <a-form-item label="上架时间">
+            <a-range-picker v-model:value="lunchTimeRange" value-format="YYYY-MM-DD" />
           </a-form-item>
         </a-col>
         <a-col :xl="6" :md="12" :sm="24">
@@ -52,20 +62,33 @@ const emits = defineEmits<{
   (e: 'search', params: Record<string, any>): void
 }>()
 
+const lunchTimeRange = ref<[string, string] | null>(null)
+
 const formModel = reactive<WallpaperQO>({
   title: '',
   type: undefined,
   source: undefined,
-  status: undefined
+  status: undefined,
+  launchTimeStart: undefined,
+  launchTimeEnd: undefined,
+  hasMainUrl: undefined,
+  bingCountry: undefined
 })
 
 const { resetFields } = useForm(formModel)
 
 const search = () => {
+  if (lunchTimeRange.value) {
+    const [start, end] = lunchTimeRange.value
+    formModel.launchTimeStart = start
+    formModel.launchTimeEnd = end
+  }
   emits('search', toRaw(formModel))
 }
 
 const reset = () => {
+  lunchTimeRange.value = null
+
   resetFields()
   search()
 }

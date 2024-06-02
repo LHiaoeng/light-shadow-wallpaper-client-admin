@@ -18,12 +18,10 @@
     <!-- 数据表格区域 -->
     <template #bodyCell="{ column, record }">
       <template v-if="column.key === 'url'">
-        <a-button type="text" title="复制壁纸网址" @click="copyToClipboard(record.url)"
-          ><template #icon><copy-outlined /></template
-        ></a-button>
-        <a :href="record.url" :target="'_blank'" :title="record.url">
-          {{ record.url }}
-        </a>
+        <UrlCell :url="record.url" />
+      </template>
+      <template v-if="column.key === 'poster'">
+        <UrlCell :url="record.poster" />
       </template>
       <template v-if="column.key === 'operate'">
         <operation-group>
@@ -58,6 +56,7 @@ import { FormAction } from '@/hooks/form'
 import { DictText } from '@/components/Dict'
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
+import UrlCell from '@/components/UrlCell/index.vue'
 
 defineOptions({ name: 'WallpaperPage' })
 
@@ -165,12 +164,14 @@ const columns: ProColumns[] = [
     ellipsis: true
   },
   {
-    title: '壁纸默认地址',
-    dataIndex: 'urlBase'
+    title: '海报地址',
+    dataIndex: 'poster',
+    ellipsis: true
   },
   {
     title: '版权信息',
-    dataIndex: 'copyright'
+    dataIndex: 'copyright',
+    ellipsis: true
   },
   {
     title: '版权信息链接',
@@ -196,6 +197,15 @@ const columns: ProColumns[] = [
     dataIndex: 'createTime',
     width: 150,
     sorter: true
+  },
+  {
+    title: '必应壁纸ID',
+    dataIndex: 'urlBase',
+    ellipsis: true
+  },
+  {
+    title: '地区',
+    dataIndex: 'bingCountry'
   },
   {
     key: 'operate',
