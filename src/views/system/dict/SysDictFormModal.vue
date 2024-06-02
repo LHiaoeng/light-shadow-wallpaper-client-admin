@@ -67,6 +67,8 @@ const { formAction, isUpdateForm } = useFormAction()
 
 // 表单模型
 const formModel = reactive<SysDictDTO>({
+  // 主键id
+  id: undefined,
   title: '',
   code: '',
   valueType: DictValueTypeEnum.NUMBER,
