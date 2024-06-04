@@ -4,7 +4,12 @@
       <a-row :gutter="16">
         <a-col :xl="6" :md="12" :sm="24">
           <a-form-item label="标题">
-            <a-input v-model:value="formModel.title" placeholder="请输入标题" />
+            <a-input
+              v-model:value="formModel.title"
+              placeholder="请输入标题"
+              allow-clear
+              @change="onTitleChange"
+            />
           </a-form-item>
         </a-col>
         <a-col :xl="6" :md="12" :sm="24">
@@ -30,6 +35,16 @@
         <a-col :xl="6" :md="12" :sm="24">
           <a-form-item label="上架时间">
             <a-range-picker v-model:value="lunchTimeRange" value-format="YYYY-MM-DD" />
+          </a-form-item>
+        </a-col>
+        <a-col :xl="6" :md="12" :sm="24">
+          <a-form-item label="必应壁纸ID">
+            <a-input
+              v-model:value="formModel.urlBase"
+              placeholder="请输入标题"
+              allow-clear
+              @change="onTitleChange"
+            />
           </a-form-item>
         </a-col>
         <a-col :xl="6" :md="12" :sm="24">
@@ -72,10 +87,15 @@ const formModel = reactive<WallpaperQO>({
   launchTimeStart: undefined,
   launchTimeEnd: undefined,
   hasMainUrl: undefined,
-  bingCountry: undefined
+  bingCountry: undefined,
+  urlBase: undefined
 })
 
 const { resetFields } = useForm(formModel)
+
+const onTitleChange = () => {
+  search()
+}
 
 const search = () => {
   if (lunchTimeRange.value) {

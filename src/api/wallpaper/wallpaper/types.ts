@@ -53,6 +53,8 @@ export interface WallpaperQO {
   hasMainUrl?: string
   // 必应壁纸所属地区
   bingCountry?: string
+  // 必应壁纸ID
+  urlBase?: string
 }
 
 /**

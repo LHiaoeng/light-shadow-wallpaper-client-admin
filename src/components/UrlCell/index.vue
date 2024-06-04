@@ -37,7 +37,7 @@ export default {
         <copy-outlined />
       </template>
     </a-button>
-    <a :href="url" target="_blank" :title="url">
+    <a :href="url" target="_blank" :title="url" referrerpolicy="no-referrer">
       {{ url }}
     </a>
   </div>

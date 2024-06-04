@@ -200,8 +200,7 @@ const columns: ProColumns[] = [
   },
   {
     title: '必应壁纸ID',
-    dataIndex: 'urlBase',
-    ellipsis: true
+    dataIndex: 'urlBase'
   },
   {
     title: '地区',

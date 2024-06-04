@@ -9,12 +9,12 @@ export type LanguageInfo = {
 export type SupportLanguage = Record<string, LanguageInfo>
 
 // 项目标题
-export const projectTitle = 'Ballcat Admin'
+export const projectTitle = 'Breadj Admin'
 // 项目描述
-export const projectDesc = 'Ballcat Admin 是一套简单好用的后台管理系统'
+export const projectDesc = '面包街后台管理系统'
 
 // Local Storage/ Session Storage 的 key 前缀 prefix
-export const storageKeyPrefix = 'ballcat-admin/'
+export const storageKeyPrefix = 'breadj-admin/'
 
 // 开启 websocket，开启此选项需要服务端同步支持 websocket 功能
 // 若服务端不支持，则本地启动时，抛出 socket 异常，导致 proxyServer 关闭
