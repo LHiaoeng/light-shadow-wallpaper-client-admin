@@ -35,3 +35,7 @@ export function updateWallpaper(dto: WallpaperDTO) {
 export function deleteWallpaper(id: number) {
   return httpClient.delete<ApiResult<void>>(`/wallpaper/wallpaper/` + id)
 }
+
+export function copyWallpaper(id: number) {
+  return httpClient.post<ApiResult<WallpaperDTO>>(`/wallpaper/wallpaper/copy/` + id)
+}

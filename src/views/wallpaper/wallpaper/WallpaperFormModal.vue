@@ -19,42 +19,48 @@
       <a-form-item label="壁纸来源">
         <dict-select v-model:value="formModel.source" dict-code="wallpaper_source" />
       </a-form-item>
-      <a-form-item label="必应壁纸所属地区">
+      <a-form-item v-if="formModel.source === 2" label="必应壁纸所属地区">
         <a-input v-model:value="formModel.bingCountry" />
       </a-form-item>
       <a-form-item label="壁纸状态">
         <dict-select v-model:value="formModel.status" dict-code="wallpaper_status" />
       </a-form-item>
       <a-form-item label="壁纸标题">
-        <a-input v-model:value="formModel.title" placeholder="请输入" />
+        <a-input v-model:value="formModel.title" placeholder="请输入" allow-clear />
       </a-form-item>
       <a-form-item label="标题链接">
-        <a-input v-model:value="formModel.titleLink" placeholder="请输入" />
+        <a-input v-model:value="formModel.titleLink" placeholder="请输入" allow-clear />
       </a-form-item>
       <a-form-item label="壁纸网址">
-        <a-input v-model:value="formModel.url" placeholder="请输入" />
+        <a-input v-model:value="formModel.url" placeholder="请输入" allow-clear />
       </a-form-item>
-      <a-form-item label="壁纸默认地址">
-        <a-input v-model:value="formModel.urlBase" placeholder="请输入" />
+      <a-form-item v-if="formModel.source === 2" label="壁纸默认地址">
+        <a-input v-model:value="formModel.urlBase" placeholder="请输入" allow-clear />
       </a-form-item>
       <a-form-item label="预览海报地址">
-        <a-input v-model:value="formModel.poster" placeholder="请输入预览海报地址" />
+        <a-input v-model:value="formModel.poster" placeholder="请输入预览海报地址" allow-clear />
       </a-form-item>
       <a-form-item label="版权信息">
-        <a-input v-model:value="formModel.copyright" placeholder="请输入" />
+        <a-input v-model:value="formModel.copyright" placeholder="请输入" allow-clear />
       </a-form-item>
       <a-form-item label="版权信息链接">
-        <a-input v-model:value="formModel.copyrightLink" placeholder="请输入" />
+        <a-input v-model:value="formModel.copyrightLink" placeholder="请输入" allow-clear />
       </a-form-item>
       <a-form-item label="壁纸描述">
-        <a-textarea v-model:value="formModel.description" placeholder="请输入壁纸描述" auto-size />
+        <a-textarea
+          v-model:value="formModel.description"
+          placeholder="请输入壁纸描述"
+          auto-size
+          allow-clear
+        />
       </a-form-item>
 
       <a-form-item label="上架时间">
         <a-date-picker
           v-model:value="formModel.launchTime"
-          format="YYYY-MM-DD 00:00:00"
-          value-format="YYYY-MM-DD 00:00:00"
+          show-time
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss"
         />
       </a-form-item>
     </a-form>
@@ -70,6 +76,7 @@ import { createWallpaper, updateWallpaper } from '@/api/wallpaper/wallpaper'
 import { overrideProperties } from '@/utils/bean-utils'
 import type { ColProps } from 'ant-design-vue'
 import { DictSelect } from '@/components/Dict'
+import dayjs, { Dayjs } from 'dayjs'
 
 const labelCol: ColProps = {
   sm: { span: 24 },

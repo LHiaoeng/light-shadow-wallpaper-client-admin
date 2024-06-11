@@ -26,6 +26,7 @@
       <template v-if="column.key === 'operate'">
         <operation-group>
           <a v-if="hasPermission('wallpaper:wallpaper:edit')" @click="handleEdit(record)">编辑</a>
+          <a v-if="hasPermission('wallpaper:wallpaper:copy')" @click="handleCopy(record)">复制</a>
           <delete-text-button
             v-if="hasPermission('wallpaper:wallpaper:del')"
             @confirm="() => handleDelete(record)"
@@ -50,7 +51,7 @@ import { OperationGroup } from '@/components/Operation'
 import { useAuthorize } from '@/hooks/permission'
 import { mergePageParam } from '@/utils/page-utils'
 import { doRequest } from '@/utils/axios/request'
-import { pageWallpaper, deleteWallpaper } from '@/api/wallpaper/wallpaper'
+import { pageWallpaper, deleteWallpaper, copyWallpaper } from '@/api/wallpaper/wallpaper'
 import type { WallpaperPageVO, WallpaperQO } from '@/api/wallpaper/wallpaper/types'
 import { FormAction } from '@/hooks/form'
 import { DictText } from '@/components/Dict'
@@ -95,6 +96,13 @@ const handleNew = () => {
 /* 编辑壁纸 */
 const handleEdit = (record: WallpaperPageVO) => {
   formModalRef.value.open(FormAction.UPDATE, record)
+}
+
+const handleCopy = (record: WallpaperPageVO) => {
+  doRequest(copyWallpaper(record.id), {
+    successMessage: '复制成功！',
+    onSuccess: () => reloadTable()
+  })
 }
 
 /* 删除壁纸 */
@@ -210,7 +218,7 @@ const columns: ProColumns[] = [
     key: 'operate',
     title: '操作',
     align: 'center',
-    width: 100
+    width: 150
   }
 ]
 </script>
