@@ -58,9 +58,9 @@ const onAnnouncementClose = (data: AnnouncementCloseMessage) => {
 
 onMounted(() => {
   // 获取公告信息
-  getUserAnnouncements().then(res => {
-    announcements.value = res.data
-  })
+  // getUserAnnouncements().then(res => {
+  //   announcements.value = res.data
+  // })
   // 定义定时器
   intervalId.value = setInterval(() => {
     if (activeIndex.value < announcementNum.value - 1) {
