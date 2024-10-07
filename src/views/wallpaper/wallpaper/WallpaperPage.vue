@@ -27,6 +27,9 @@
         <operation-group>
           <a v-if="hasPermission('wallpaper:wallpaper:edit')" @click="handleEdit(record)">编辑</a>
           <a v-if="hasPermission('wallpaper:wallpaper:copy')" @click="handleCopy(record)">复制</a>
+          <a v-if="hasPermission('wallpaper:wallpaper:edit')" @click="handleManageSource(record)"
+            >管理源</a
+          >
           <delete-text-button
             v-if="hasPermission('wallpaper:wallpaper:del')"
             @confirm="() => handleDelete(record)"
@@ -38,6 +41,7 @@
 
   <!-- 系统配置新建修改的表单弹窗 -->
   <wallpaper-form-modal ref="formModalRef" @submit-success="reloadTable" />
+  <WallpaperUrlAddModal ref="addUrlModalRef" @submit-success="reloadTable" />
 </template>
 
 <script setup lang="ts">
@@ -58,6 +62,8 @@ import { DictText } from '@/components/Dict'
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import UrlCell from '@/components/UrlCell/index.vue'
+import WallpaperUrlAddModal from '@/views/wallpaper/wallpaper/WallpaperUrlAddModal.vue'
+import { ref } from 'vue'
 
 defineOptions({ name: 'WallpaperPage' })
 
@@ -67,6 +73,7 @@ const { hasPermission } = useAuthorize()
 // 表格组件引用
 const tableRef = ref<ProTableInstanceExpose>()
 const formModalRef = ref<InstanceType<typeof WallpaperFormModal>>()
+const addUrlModalRef = ref<InstanceType<typeof WallpaperUrlAddModal>>()
 
 /* 刷新表格 */
 const reloadTable = (resetPageIndex?: boolean) => {
@@ -95,7 +102,16 @@ const handleNew = () => {
 
 /* 编辑壁纸 */
 const handleEdit = (record: WallpaperPageVO) => {
-  formModalRef.value.open(FormAction.UPDATE, record)
+  if (formModalRef.value) {
+    formModalRef.value.open(FormAction.UPDATE, record)
+  }
+}
+
+/* 管理源 */
+const handleManageSource = (record: WallpaperPageVO) => {
+  if (addUrlModalRef.value) {
+    addUrlModalRef.value.open(record)
+  }
 }
 
 const handleCopy = (record: WallpaperPageVO) => {
@@ -112,17 +128,6 @@ const handleDelete = (record: WallpaperPageVO) => {
     onSuccess: () => reloadTable()
   })
 }
-
-const copyToClipboard = text => {
-  const el = document.createElement('textarea')
-  el.value = text
-  document.body.appendChild(el)
-  el.select()
-  document.execCommand('copy')
-  document.body.removeChild(el)
-  message.success('复制成功')
-}
-
 const columns: ProColumns[] = [
   {
     title: '序号',
@@ -218,7 +223,7 @@ const columns: ProColumns[] = [
     key: 'operate',
     title: '操作',
     align: 'center',
-    width: 150
+    width: 200
   }
 ]
 </script>

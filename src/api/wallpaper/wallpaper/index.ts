@@ -1,6 +1,7 @@
 import httpClient from '@/utils/axios'
 import type { ApiResult } from '@/api/types'
 import type { WallpaperDTO, WallpaperPageParam, WallpaperPageVO } from './types'
+import type { OssFileInfo } from '@/api/oss/types'
 
 /**
  * 壁纸分页查询
@@ -38,4 +39,8 @@ export function deleteWallpaper(id: number) {
 
 export function copyWallpaper(id: number) {
   return httpClient.post<ApiResult<WallpaperDTO>>(`/wallpaper/wallpaper/copy/` + id)
+}
+
+export function uploadWallpaper(formData: FormData) {
+  return httpClient.post<ApiResult<OssFileInfo>>('/wallpaper/wallpaper/uploadWallpaper', formData)
 }

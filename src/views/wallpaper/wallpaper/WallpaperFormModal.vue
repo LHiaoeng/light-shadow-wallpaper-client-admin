@@ -10,7 +10,6 @@
     @cancel="handleClose"
   >
     <template #footer>
-      <a-button key="addUrl" type="primary" @click="handleAddUrl">新增源</a-button>
       <a-button key="back" @click="handleClose">取消</a-button>
       <a-button key="submit" type="primary" @click="handleSubmit">保存</a-button>
     </template>
@@ -94,9 +93,28 @@
         />
       </a-form-item>
     </a-form>
+    <div class="clearfix">
+      <a-upload
+        v-model:file-list="fileList"
+        list-type="picture-card"
+        :custom-request="e => customRequest(e)"
+        @preview="handlePreview"
+      >
+        <div v-if="fileList.length < 8">
+          <plus-outlined />
+          <div style="margin-top: 8px">Upload</div>
+        </div>
+      </a-upload>
+      <a-modal
+        :visible="previewVisible"
+        :title="previewTitle"
+        :footer="null"
+        @cancel="handleCancel"
+      >
+        <img alt="example" style="width: 100%" :src="previewImage" />
+      </a-modal>
+    </div>
   </a-modal>
-
-  <WallpaperUrlAddModal ref="addUrlModalRef" @submit-success="closeModal()" />
 </template>
 
 <script setup lang="ts">
@@ -104,7 +122,7 @@ import { useModal } from '@/hooks/modal'
 import { FormAction, useAdminForm, useFormAction } from '@/hooks/form'
 import type { FormRequestMapping } from '@/hooks/form'
 import type { WallpaperDTO, WallpaperPageVO } from '@/api/wallpaper/wallpaper/types'
-import { createWallpaper, updateWallpaper } from '@/api/wallpaper/wallpaper'
+import { createWallpaper, updateWallpaper, uploadWallpaper } from '@/api/wallpaper/wallpaper'
 import { overrideProperties } from '@/utils/bean-utils'
 import type { ColProps } from 'ant-design-vue'
 import { DictSelect } from '@/components/Dict'
@@ -194,13 +212,6 @@ const handleClose = () => {
   submitLoading.value = false
 }
 
-const addUrlModalRef = ref<InstanceType<typeof WallpaperUrlAddModal>>()
-
-const handleAddUrl = () => {
-  const model = { ...formModel }
-  addUrlModalRef.value.open(model)
-}
-
 defineExpose({
   open(newFormAction: FormAction, record?: WallpaperPageVO) {
     openModal()
@@ -214,6 +225,112 @@ defineExpose({
     formAction.value = newFormAction
   }
 })
+
+import { PlusOutlined } from '@ant-design/icons-vue'
+import { defineComponent, ref } from 'vue'
+import type { UploadProps } from 'ant-design-vue'
+
+function getBase64(file: File) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = error => reject(error)
+  })
+}
+
+const previewVisible = ref(false)
+const previewImage = ref('')
+const previewTitle = ref('')
+
+function customRequest(options: any) {
+  console.log(options)
+  const formData = new FormData()
+  formData.append('file', options.file)
+  formData.append('paramJsonStr', JSON.stringify(uploadOssInfo))
+  uploadWallpaper(formData)
+    .then((response: any) => {
+      if (response.code == 200) {
+        options.onSuccess(response, options.file)
+      } else {
+        options.onError(response, options.file)
+      }
+    })
+    .catch((error: any) => {
+      options.onError(error, options.file)
+    })
+}
+
+// customRequest(options, path) {
+//   let formData = new FormData();
+//   formData.append("file", options.file);
+//   reqFileUpload(path, formData).then(response => {
+//     if (response.code == 0) {
+//       options.onSuccess(response, options.file);
+//       message.success('上传成功！');
+//       this.getFileList()
+//     } else {
+//       message.error(response.msg);
+//     }
+//   })
+// }
+
+const uploadOssInfo = {
+  ossProvider: 'upyun',
+  uploadDirectory: 'wallpaper'
+}
+
+const fileList = ref<UploadProps['fileList']>([
+  {
+    uid: '-1',
+    name: 'image.png',
+    status: 'done',
+    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+  },
+  {
+    uid: '-2',
+    name: 'image.png',
+    status: 'done',
+    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+  },
+  {
+    uid: '-3',
+    name: 'image.png',
+    status: 'done',
+    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+  },
+  {
+    uid: '-4',
+    name: 'image.png',
+    status: 'done',
+    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+  },
+  {
+    uid: '-xxx',
+    percent: 50,
+    name: 'image.png',
+    status: 'uploading',
+    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+  },
+  {
+    uid: '-5',
+    name: 'image.png',
+    status: 'error'
+  }
+])
+
+const handleCancel = () => {
+  previewVisible.value = false
+  previewTitle.value = ''
+}
+const handlePreview = async (file: UploadProps['fileList'][number]) => {
+  if (!file.url && !file.preview) {
+    file.preview = (await getBase64(file.originFileObj)) as string
+  }
+  previewImage.value = file.url || file.preview
+  previewVisible.value = true
+  previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1)
+}
 </script>
 
 <style lang="less" scoped>
