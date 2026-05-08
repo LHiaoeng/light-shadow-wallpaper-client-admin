@@ -44,3 +44,13 @@ export function copyWallpaper(id: number) {
 export function uploadWallpaper(formData: FormData) {
   return httpClient.post<ApiResult<OssFileInfo>>('/wallpaper/wallpaper/uploadWallpaper', formData)
 }
+
+export function backupWallpaper(id: number, force = false) {
+  return httpClient.post<ApiResult<void>>(`/wallpaper/wallpaper/${id}/backup`, undefined, {
+    params: { force }
+  })
+}
+
+export function backupVideoWallpaper(id: number, force = false) {
+  return backupWallpaper(id, force)
+}

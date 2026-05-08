@@ -23,10 +23,17 @@
       <template v-if="column.key === 'poster'">
         <UrlCell :url="record.poster" />
       </template>
+      <template v-if="column.key === 'urlBackup'">
+        <UrlCell :url="record.urlBackup" />
+      </template>
+      <template v-if="column.key === 'posterBackup'">
+        <UrlCell :url="record.posterBackup" />
+      </template>
       <template v-if="column.key === 'operate'">
         <operation-group>
           <a v-if="hasPermission('wallpaper:wallpaper:edit')" @click="handleEdit(record)">编辑</a>
           <a v-if="hasPermission('wallpaper:wallpaper:copy')" @click="handleCopy(record)">复制</a>
+          <a v-if="hasPermission('wallpaper:wallpaper:backup')" @click="handleBackup(record)">备份</a>
           <a v-if="hasPermission('wallpaper:wallpaper:edit')" @click="handleManageSource(record)"
             >管理源</a
           >
@@ -55,12 +62,16 @@ import { OperationGroup } from '@/components/Operation'
 import { useAuthorize } from '@/hooks/permission'
 import { mergePageParam } from '@/utils/page-utils'
 import { doRequest } from '@/utils/axios/request'
-import { pageWallpaper, deleteWallpaper, copyWallpaper } from '@/api/wallpaper/wallpaper'
+import {
+  pageWallpaper,
+  deleteWallpaper,
+  copyWallpaper,
+  backupWallpaper
+} from '@/api/wallpaper/wallpaper'
 import type { WallpaperPageVO, WallpaperQO } from '@/api/wallpaper/wallpaper/types'
 import { FormAction } from '@/hooks/form'
 import { DictText } from '@/components/Dict'
 import dayjs from 'dayjs'
-import { message } from 'ant-design-vue'
 import UrlCell from '@/components/UrlCell/index.vue'
 import WallpaperUrlAddModal from '@/views/wallpaper/wallpaper/WallpaperUrlAddModal.vue'
 import { ref } from 'vue'
@@ -115,15 +126,22 @@ const handleManageSource = (record: WallpaperPageVO) => {
 }
 
 const handleCopy = (record: WallpaperPageVO) => {
-  doRequest(copyWallpaper(record.id), {
+  doRequest(copyWallpaper(record.id!), {
     successMessage: '复制成功！',
+    onSuccess: () => reloadTable()
+  })
+}
+
+const handleBackup = (record: WallpaperPageVO) => {
+  doRequest(backupWallpaper(record.id!, true), {
+    successMessage: '已提交备份任务',
     onSuccess: () => reloadTable()
   })
 }
 
 /* 删除壁纸 */
 const handleDelete = (record: WallpaperPageVO) => {
-  doRequest(deleteWallpaper(record.id), {
+  doRequest(deleteWallpaper(record.id!), {
     successMessage: '删除成功！',
     onSuccess: () => reloadTable()
   })
@@ -174,11 +192,25 @@ const columns: ProColumns[] = [
   {
     title: '壁纸网址',
     dataIndex: 'url',
+    key: 'url',
     ellipsis: true
   },
   {
     title: '海报地址',
     dataIndex: 'poster',
+    key: 'poster',
+    ellipsis: true
+  },
+  {
+    title: '备份资源地址',
+    dataIndex: 'urlBackup',
+    key: 'urlBackup',
+    ellipsis: true
+  },
+  {
+    title: '备份海报地址',
+    dataIndex: 'posterBackup',
+    key: 'posterBackup',
     ellipsis: true
   },
   {
@@ -223,7 +255,7 @@ const columns: ProColumns[] = [
     key: 'operate',
     title: '操作',
     align: 'center',
-    width: 200
+    width: 240
   }
 ]
 </script>

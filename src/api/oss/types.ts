@@ -11,7 +11,7 @@ export enum OssProviderEnum {
  */
 export type UploadOssInfo = {
   // 云存储服务商
-  ossProvider?: OssProviderEnum[]
+  ossProvider?: OssProviderEnum
   // 上传目录
   uploadDirectory?: string
 }
