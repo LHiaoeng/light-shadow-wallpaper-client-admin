@@ -13,7 +13,7 @@
 
         <a-popover trigger="click" placement="right">
           <template #content>
-            <sketch v-model="tagColorPicker" @update:model-value="onTagColorPicker" />
+            <sketch :model-value="tagColorPicker" @update:model-value="onTagColorPicker" />
           </template>
           <highlight-two-tone />
         </a-popover>
@@ -27,7 +27,7 @@
         <span :style="{ marginLeft: '5px', color: attributes.textColor }">文本样式</span>
         <a-popover trigger="click" placement="right">
           <template #content>
-            <sketch v-model="textColorPicker" @update:model-value="onTextColorPicker" />
+            <sketch :model-value="textColorPicker" @update:model-value="onTextColorPicker" />
           </template>
           <highlight-two-tone />
         </a-popover>
@@ -60,7 +60,7 @@
 
         <a-popover trigger="click" placement="right">
           <template #content>
-            <sketch v-model="badgeColorPicker" @update:model-value="onBadgeColorPicker" />
+            <sketch :model-value="badgeColorPicker" @update:model-value="onBadgeColorPicker" />
           </template>
           <highlight-two-tone />
         </a-popover>
