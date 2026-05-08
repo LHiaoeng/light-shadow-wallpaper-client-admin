@@ -30,6 +30,14 @@ const modelValue = computed({
   set: value => emit('update:value', value || '')
 })
 
+const previewUrl = computed(() => {
+  const url = modelValue.value?.trim()
+  if (!url) {
+    return ''
+  }
+  return url.startsWith('//') ? `https:${url}` : url
+})
+
 const customRequest: UploadProps['customRequest'] = options => {
   const file = options.file as File
   const formData = new FormData()
@@ -82,14 +90,14 @@ const customRequest: UploadProps['customRequest'] = options => {
       </a-upload>
     </a-input-group>
 
-    <div v-if="modelValue" class="preview-box">
+    <div v-if="previewUrl" class="preview-box">
       <a-image
         v-if="previewType === 'image'"
-        :src="modelValue"
+        :src="previewUrl"
         :width="320"
         referrerpolicy="no-referrer"
       />
-      <video v-else :src="modelValue" controls muted class="video-preview" />
+      <video v-else :src="previewUrl" controls muted class="video-preview" />
     </div>
   </div>
 </template>

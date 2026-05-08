@@ -11,6 +11,14 @@ const props = withDefaults(defineProps<Props>(), {
   copyTitle: '复制网址'
 })
 
+const hrefUrl = computed(() => {
+  const url = props.url?.trim()
+  if (!url) {
+    return ''
+  }
+  return url.startsWith('//') ? `https:${url}` : url
+})
+
 // Copy to Clipboard Function
 const copyToClipboard = (url: string): void => {
   // Fallback method using a temporary textarea element
@@ -68,7 +76,7 @@ export default {
         <copy-outlined />
       </template>
     </a-button>
-    <a :href="url" target="_blank" :title="url" referrerpolicy="no-referrer">
+    <a :href="hrefUrl" target="_blank" :title="url" referrerpolicy="no-referrer">
       {{ url }}
     </a>
   </div>
