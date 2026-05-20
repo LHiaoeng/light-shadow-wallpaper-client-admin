@@ -45,8 +45,8 @@
 import { useModal } from '@/hooks/modal'
 import { FormAction, useAdminForm, useFormAction } from '@/hooks/form'
 import type { FormRequestMapping } from '@/hooks/form'
-import type { UniverseDTO, UniversePageVO } from '@/api/universe/types'
-import { createUniverse, updateUniverse } from '@/api/universe/universe-data'
+import type { UniverseDTO, UniversePageVO } from '@/api/lol/universe/types'
+import { createUniverse, updateUniverse } from '@/api/lol/universe'
 import { overrideProperties } from '@/utils/bean-utils'
 import type { ColProps } from 'ant-design-vue'
 

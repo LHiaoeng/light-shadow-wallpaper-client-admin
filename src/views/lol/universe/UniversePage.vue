@@ -12,18 +12,18 @@
   >
     <!-- 操作按钮区域 -->
     <template #toolBarRender>
-      <new-button v-if="hasPermission('universe-data:universe-data:add')" @click="handleNew" />
+      <new-button v-if="hasPermission('lol:universe:add')" @click="handleNew" />
     </template>
 
     <!-- 数据表格区域 -->
     <template #bodyCell="{ column, record }">
       <template v-if="column.key === 'operate'">
         <operation-group>
-          <a v-if="hasPermission('universe-data:universe-data:edit')" @click="handleEdit(record)"
+          <a v-if="hasPermission('lol:universe:edit')" @click="handleEdit(record)"
             >编辑</a
           >
           <delete-text-button
-            v-if="hasPermission('universe-data:universe-data:del')"
+            v-if="hasPermission('lol:universe:del')"
             @confirm="() => handleDelete(record)"
           />
         </operation-group>
@@ -46,8 +46,8 @@ import { OperationGroup } from '@/components/Operation'
 import { useAuthorize } from '@/hooks/permission'
 import { mergePageParam } from '@/utils/page-utils'
 import { doRequest } from '@/utils/axios/request'
-import { pageUniverse, deleteUniverse } from '@/api/universe/universe-data'
-import type { UniversePageVO, UniverseQO } from '@/api/universe/types'
+import { pageUniverse, deleteUniverse } from '@/api/lol/universe'
+import type { UniversePageVO, UniverseQO } from '@/api/lol/universe/types'
 import { FormAction } from '@/hooks/form'
 
 defineOptions({ name: 'UniversePage' })

@@ -12,7 +12,7 @@
   >
     <!-- 操作按钮区域 -->
     <template #toolBarRender>
-      <new-button v-if="hasPermission('champion:champion:add')" @click="handleNew" />
+      <new-button v-if="hasPermission('lol:champion:add')" @click="handleNew" />
     </template>
 
     <!-- 数据表格区域 -->
@@ -25,9 +25,9 @@
       </template>
       <template v-if="column.key === 'operate'">
         <operation-group>
-          <a v-if="hasPermission('champion:champion:edit')" @click="handleEdit(record)">编辑</a>
+          <a v-if="hasPermission('lol:champion:edit')" @click="handleEdit(record)">编辑</a>
           <delete-text-button
-            v-if="hasPermission('champion:champion:del')"
+            v-if="hasPermission('lol:champion:del')"
             @confirm="() => handleDelete(record)"
           />
         </operation-group>

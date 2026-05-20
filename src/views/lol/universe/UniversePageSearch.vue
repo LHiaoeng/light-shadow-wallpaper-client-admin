@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { Form } from 'ant-design-vue'
-import type { UniverseQO } from '@/api/universe/types'
+import type { UniverseQO } from '@/api/lol/universe/types'
 const useForm = Form.useForm
 
 // 表单 label 全局配置

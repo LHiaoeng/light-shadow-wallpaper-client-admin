@@ -7,7 +7,7 @@ import type { UniverseDTO, UniversePageParam, UniversePageVO } from './types'
  * @param pageParams 分页参数
  */
 export function pageUniverse(pageParams: UniversePageParam) {
-  return httpClient.get<ApiResult<UniversePageVO>>('/universe/universe-data/page', {
+  return httpClient.get<ApiResult<UniversePageVO>>('/lol/universe/page', {
     params: pageParams
   })
 }
@@ -17,7 +17,7 @@ export function pageUniverse(pageParams: UniversePageParam) {
  * @param dto
  */
 export function createUniverse(dto: UniverseDTO) {
-  return httpClient.post<ApiResult<void>>('/universe/universe-data', dto)
+  return httpClient.post<ApiResult<void>>('/lol/universe', dto)
 }
 
 /**
@@ -25,7 +25,7 @@ export function createUniverse(dto: UniverseDTO) {
  * @param dto
  */
 export function updateUniverse(dto: UniverseDTO) {
-  return httpClient.put<ApiResult<void>>('/universe/universe-data', dto)
+  return httpClient.put<ApiResult<void>>('/lol/universe', dto)
 }
 
 /**
@@ -33,5 +33,5 @@ export function updateUniverse(dto: UniverseDTO) {
  * @param id 主键ID
  */
 export function deleteUniverse(id: number) {
-  return httpClient.delete<ApiResult<void>>(`/universe/universe-data/` + id)
+  return httpClient.delete<ApiResult<void>>(`/lol/universe/` + id)
 }
