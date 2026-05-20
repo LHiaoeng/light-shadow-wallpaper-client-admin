@@ -1,7 +1,7 @@
 {
   "name": "ballcat-ui-vue3",
   "version": "0.0.0",
-  "packageManager": "pnpm@8.2.0",
+  "packageManager": "pnpm@9.0.4",
   "scripts": {
     "dev": "vite --host",
     "build": "run-p type-check build-only",
