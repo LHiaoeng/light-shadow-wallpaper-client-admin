@@ -11,9 +11,10 @@ export interface LolSkinDTO {
   description?: string
   descriptionEng?: string
   skinType?: string
-  regionRarityId?: number
+  regionRarityId?: number | string
   rarity?: string
   isLegacy?: number
+  isLegacyGlobal?: number
   isPbeOnly?: number
   pbeFirstSeenTime?: string
   releaseTime?: string
@@ -27,20 +28,18 @@ export interface LolSkinDTO {
   emblemNames?: string
   chromasJson?: string
   questSkinInfoJson?: string
-  mirror?: string
-  sourceUrl?: string
 }
 
 export interface LolSkinQO {
   championId?: number
   riotSkinId?: number
   contentId?: string
-  regionRarityId?: number
+  regionRarityId?: number | string
   rarity?: string
   keyword?: string
-  emblemName?: string
   skinlineId?: string
   isLegacy?: number
+  isLegacyGlobal?: number
   isPbeOnly?: number
   releaseTimeStart?: string
   releaseTimeEnd?: string
