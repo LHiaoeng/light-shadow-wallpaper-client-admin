@@ -37,6 +37,7 @@ export interface LolSkinQO {
   regionRarityId?: number | string
   rarity?: string
   keyword?: string
+  emblemName?: string
   skinlineId?: string
   isLegacy?: number
   isLegacyGlobal?: number

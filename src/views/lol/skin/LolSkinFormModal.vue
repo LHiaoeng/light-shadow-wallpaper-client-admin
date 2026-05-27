@@ -64,20 +64,52 @@
         </a-col>
         <a-col :xl="8" :md="12" :sm="24">
           <a-form-item label="国服稀有度">
-            <dict-select
-              v-model:value="formModel.regionRarityId"
-              dict-code="lol_skin_rarity_cn"
+            <a-select
+              v-model:value="regionRarityIdValue"
               allow-clear
-            />
+              show-search
+              option-label-prop="label"
+              :filter-option="filterDictOption"
+            >
+              <a-select-option
+                v-for="item in cnRarityDictItems"
+                :key="item.id"
+                :value="String(item.value)"
+                :label="item.name"
+                :disabled="item.disabled"
+                :name="item.name"
+              >
+                <span class="dict-option">
+                  <img v-if="getCnRarityIconUrl(item.value)" :src="getCnRarityIconUrl(item.value)" />
+                  <span>{{ item.name }}</span>
+                </span>
+              </a-select-option>
+            </a-select>
           </a-form-item>
         </a-col>
         <a-col :xl="8" :md="12" :sm="24">
           <a-form-item label="直营服稀有度">
-            <dict-select
+            <a-select
               v-model:value="formModel.rarity"
-              dict-code="lol_skin_rarity_global"
               allow-clear
-            />
+              show-search
+              option-label-prop="label"
+              :filter-option="filterDictOption"
+            >
+              <a-select-option
+                v-for="item in globalRarityDictItems"
+                :key="item.id"
+                :value="item.value"
+                :label="item.name"
+                :disabled="item.disabled"
+                :name="item.name"
+              >
+                <span class="dict-option">
+                  <img v-if="getGlobalRarityIconUrl(item.value)" :src="getGlobalRarityIconUrl(item.value)" />
+                  <span>{{ item.name }}</span>
+                </span>
+              </a-select-option>
+            </a-select>
           </a-form-item>
         </a-col>
         <a-col :xl="8" :md="12" :sm="24">
@@ -195,7 +227,28 @@
         </a-col>
         <a-col :xl="12" :md="12" :sm="24">
           <a-form-item label="徽章">
-            <a-input v-model:value="formModel.emblemNames" />
+            <a-select
+              v-model:value="emblemNameList"
+              mode="multiple"
+              allow-clear
+              show-search
+              option-label-prop="label"
+              :filter-option="filterDictOption"
+            >
+              <a-select-option
+                v-for="item in emblemDictItems"
+                :key="item.id"
+                :value="String(item.value)"
+                :label="item.name"
+                :disabled="item.disabled"
+                :name="item.name"
+              >
+                <span class="dict-option">
+                  <img v-if="getEmblemIconUrl(item.value)" :src="getEmblemIconUrl(item.value)" />
+                  <span>{{ item.name }}</span>
+                </span>
+              </a-select-option>
+            </a-select>
           </a-form-item>
         </a-col>
         <a-col :span="24">
@@ -228,8 +281,8 @@ import type { FormRequestMapping } from '@/hooks/form'
 import type { ColProps } from 'ant-design-vue'
 import { createLolSkin, updateLolSkin } from '@/api/lol/skin'
 import type { LolSkinDTO, LolSkinPageVO } from '@/api/lol/skin/types'
-import { DictSelect } from '@/components/Dict'
 import { toBreadjAssetUrl } from '@/utils/community-dragon-utils'
+import { useLolSkinDictPresentation } from './lol-skin-dict-presentation'
 
 const labelCol: ColProps = { sm: { span: 24 }, md: { span: 8 } }
 const wrapperCol: ColProps = { sm: { span: 24 }, md: { span: 15 } }
@@ -242,6 +295,14 @@ const emits = defineEmits<{
 
 const { title, visible, openModal, closeModal } = useModal()
 const { formAction, isUpdateForm } = useFormAction()
+const {
+  cnRarityDictItems,
+  globalRarityDictItems,
+  emblemDictItems,
+  getCnRarityIconUrl,
+  getGlobalRarityIconUrl,
+  getEmblemIconUrl
+} = useLolSkinDictPresentation()
 
 const getDefaultFormModel = (): LolSkinDTO => ({
   id: undefined,
@@ -274,6 +335,31 @@ const getDefaultFormModel = (): LolSkinDTO => ({
 })
 
 const formModel = reactive<LolSkinDTO>(getDefaultFormModel())
+const regionRarityIdValue = computed<string | undefined>({
+  get: () => {
+    if (formModel.regionRarityId === undefined || formModel.regionRarityId === null || formModel.regionRarityId === '') {
+      return undefined
+    }
+    return String(formModel.regionRarityId)
+  },
+  set: value => {
+    formModel.regionRarityId = value
+  }
+})
+const emblemNameList = computed<string[]>({
+  get: () => {
+    if (!formModel.emblemNames) {
+      return []
+    }
+    return formModel.emblemNames
+      .split(',')
+      .map(item => item.trim())
+      .filter(Boolean)
+  },
+  set: value => {
+    formModel.emblemNames = value.length ? value.join(',') : undefined
+  }
+})
 
 const formRule = reactive({})
 const formRequestMapping: FormRequestMapping<LolSkinDTO> = {
@@ -304,6 +390,10 @@ const handleClose = () => {
 
 const getAssetPreviewUrl = (path?: string) => {
   return toBreadjAssetUrl(path, formModel.isPbeOnly === 1 ? 'pbe' : 'latest')
+}
+
+const filterDictOption = (input: string, option?: { name?: string }) => {
+  return String(option?.name || '').toLowerCase().includes(input.toLowerCase())
 }
 
 const resetFormModel = () => {
@@ -371,5 +461,18 @@ defineExpose({
 
 .json-textarea {
   font-family: Consolas, Monaco, 'Courier New', monospace;
+}
+
+.dict-option {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+
+  img {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    object-fit: contain;
+  }
 }
 </style>

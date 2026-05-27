@@ -47,6 +47,24 @@
         </a-tooltip>
         <span v-else>{{ getGlobalRarityName(record.rarity) || '-' }}</span>
       </template>
+      <template v-if="column.key === 'emblemNames'">
+        <div v-if="getEmblemDisplayItems(record.emblemNames).length" class="dict-icon-group">
+          <a-tooltip
+            v-for="emblem in getEmblemDisplayItems(record.emblemNames)"
+            :key="String(emblem.value)"
+            :title="emblem.name"
+          >
+            <img
+              v-if="emblem.iconUrl"
+              class="dict-icon"
+              :src="emblem.iconUrl"
+              :alt="String(emblem.name || '')"
+            />
+            <span v-else class="dict-text-fallback">{{ emblem.name }}</span>
+          </a-tooltip>
+        </div>
+        <span v-else>-</span>
+      </template>
       <template v-if="column.key === 'isPbeOnly'">
         <a-tag :color="record.isPbeOnly === 1 ? 'orange' : 'green'">
           {{ record.isPbeOnly === 1 ? '仅 PBE' : '已上线' }}
@@ -90,9 +108,7 @@ import { deleteLolSkin, pageLolSkin } from '@/api/lol/skin'
 import type { LolSkinPageVO, LolSkinQO } from '@/api/lol/skin/types'
 import { FormAction } from '@/hooks/form'
 import { toBreadjAssetUrl } from '@/utils/community-dragon-utils'
-import { useDict } from '@/components/Dict/use-dict'
-import type { DictItem, DictValue } from '@/api/system/dict/types'
-import type { Ref } from 'vue'
+import { useLolSkinDictPresentation } from './lol-skin-dict-presentation'
 
 defineOptions({ name: 'LolSkinPage' })
 
@@ -139,59 +155,13 @@ const getPreviewUrl = (record: LolSkinPageVO) => {
   return toBreadjAssetUrl(record.tilePath, version) || toBreadjAssetUrl(record.splashPath, version)
 }
 
-const cnRarityDictItems = useDict({ dictCode: 'lol_skin_rarity_cn' })
-const globalRarityDictItems = useDict({ dictCode: 'lol_skin_rarity_global' })
-
-const findDictItem = (dictItems: Ref<DictItem[]>, value?: DictValue | null) => {
-  if (value === undefined || value === null || value === '') {
-    return undefined
-  }
-  return dictItems.value.find(item => String(item.value) === String(value))
-}
-
-const getIconPaths = (dictItem?: DictItem) => {
-  const iconPaths = dictItem?.attributes?.gemIconUrls
-  if (Array.isArray(iconPaths)) {
-    return iconPaths.filter(Boolean).map(String)
-  }
-  return iconPaths ? [String(iconPaths)] : []
-}
-
-const getIconFileName = (path: string) => {
-  return path.split('/').pop()?.toLowerCase() || ''
-}
-
-const getPreferredIconPath = (dictItem?: DictItem, matcher?: (path: string) => boolean) => {
-  const iconPaths = getIconPaths(dictItem)
-  return matcher ? iconPaths.find(matcher) || iconPaths[0] : iconPaths[0]
-}
-
-const getCnRarityIconPath = (dictItem?: DictItem, value?: DictValue | null) => {
-  const rarityId = value === undefined || value === null || value === '' ? '' : String(value)
-  return getPreferredIconPath(dictItem, path => getIconFileName(path) === `cn-gem-${rarityId}.png`)
-}
-
-const getGlobalRarityIconPath = (dictItem?: DictItem, value?: DictValue | null) => {
-  const rarity = value === undefined || value === null || value === '' ? '' : String(value)
-  const iconName = `${rarity.replace(/^k/i, '').toLowerCase()}.png`
-  return getPreferredIconPath(dictItem, path => getIconFileName(path) === iconName)
-}
-
-const getRarityName = (dictItems: Ref<DictItem[]>, value?: DictValue | null) => {
-  return findDictItem(dictItems, value)?.name || value
-}
-
-const getCnRarityIconUrl = (value?: DictValue | null) => {
-  const dictItem = findDictItem(cnRarityDictItems, value)
-  return toBreadjAssetUrl(getCnRarityIconPath(dictItem, value))
-}
-const getGlobalRarityIconUrl = (value?: DictValue | null) => {
-  const dictItem = findDictItem(globalRarityDictItems, value)
-  return toBreadjAssetUrl(getGlobalRarityIconPath(dictItem, value))
-}
-const getCnRarityName = (value?: DictValue | null) => getRarityName(cnRarityDictItems, value)
-const getGlobalRarityName = (value?: DictValue | null) =>
-  getRarityName(globalRarityDictItems, value)
+const {
+  getCnRarityIconUrl,
+  getGlobalRarityIconUrl,
+  getCnRarityName,
+  getGlobalRarityName,
+  getEmblemDisplayItems
+} = useLolSkinDictPresentation()
 
 const columns: ProColumns[] = [
   {
@@ -272,6 +242,7 @@ const columns: ProColumns[] = [
     ellipsis: true
   },
   {
+    key: 'emblemNames',
     title: '徽章',
     dataIndex: 'emblemNames',
     width: 160,
@@ -294,11 +265,28 @@ const columns: ProColumns[] = [
 </script>
 
 <style scoped lang="less">
-.rarity-icon {
+.rarity-icon,
+.dict-icon {
   width: 28px;
   height: 28px;
   flex: none;
   object-fit: contain;
   vertical-align: middle;
+}
+
+.dict-icon-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.dict-text-fallback {
+  display: inline-block;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 </style>

@@ -13,8 +13,9 @@ const RAW_BASE_URLS = [
 ]
 
 type CommunityDragonVersion = 'latest' | 'pbe'
+type CommunityDragonLang = 'default' | 'zh_cn'
 
-export function getRelativeResourcePath(path?: string) {
+export function getRelativeResourcePath(path?: string, lang: CommunityDragonLang = 'default') {
   if (!path) {
     return path
   }
@@ -37,16 +38,26 @@ export function getRelativeResourcePath(path?: string) {
   }
 
   if (relativePath.startsWith(ASSET_PATH_PREFIX)) {
-    relativePath = FILE_PATH_PREFIX + relativePath.substring(ASSET_PATH_PREFIX.length)
+    relativePath =
+      `plugins/rcp-be-lol-game-data/global/${lang}` +
+      relativePath.substring(ASSET_PATH_PREFIX.length)
   } else if (relativePath.startsWith('/')) {
     relativePath = relativePath.substring(1)
+  }
+
+  if (lang === 'zh_cn' && relativePath.includes('/v1/emblem-images/')) {
+    relativePath = relativePath.replace('/global/default/', '/global/zh_cn/')
   }
 
   return relativePath
 }
 
-export function toBreadjAssetUrl(path?: string, version: CommunityDragonVersion = 'latest') {
-  const relativePath = getRelativeResourcePath(path)
+export function toBreadjAssetUrl(
+  path?: string,
+  version: CommunityDragonVersion = 'latest',
+  lang: CommunityDragonLang = 'default'
+) {
+  const relativePath = getRelativeResourcePath(path, lang)
   if (!relativePath) {
     return relativePath
   }
