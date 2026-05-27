@@ -1,5 +1,5 @@
 import httpClient from '@/utils/axios'
-import type { ApiResult } from '@/api/types'
+import type { ApiResult, PageResult } from '@/api/types'
 import type { SkinlineDTO, SkinlinePageParam, SkinlinePageVO } from './types'
 
 /**
@@ -7,7 +7,7 @@ import type { SkinlineDTO, SkinlinePageParam, SkinlinePageVO } from './types'
  * @param pageParams 分页参数
  */
 export function pageSkinline(pageParams: SkinlinePageParam) {
-  return httpClient.get<ApiResult<SkinlinePageVO>>('/lol/skinline/page', {
+  return httpClient.get<ApiResult<PageResult<SkinlinePageVO>>>('/lol/skinline/page', {
     params: pageParams
   })
 }

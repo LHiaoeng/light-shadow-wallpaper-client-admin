@@ -222,7 +222,25 @@
         </a-col>
         <a-col :xl="12" :md="12" :sm="24">
           <a-form-item label="皮肤系列">
-            <a-input v-model:value="formModel.skinlineIdSets" />
+            <a-select
+              v-model:value="skinlineIdList"
+              mode="multiple"
+              allow-clear
+              show-search
+              option-label-prop="label"
+              :loading="skinlineLoading"
+              :filter-option="filterDictOption"
+            >
+              <a-select-option
+                v-for="item in skinlineOptions"
+                :key="item.riotSkinlineId"
+                :value="String(item.riotSkinlineId)"
+                :label="item.name"
+                :name="`${item.name || ''} ${item.engName || ''} ${item.riotSkinlineId}`"
+              >
+                {{ item.name || item.engName || item.riotSkinlineId }}
+              </a-select-option>
+            </a-select>
           </a-form-item>
         </a-col>
         <a-col :xl="12" :md="12" :sm="24">
@@ -256,8 +274,31 @@
             <a-textarea
               v-model:value="formModel.chromasJson"
               class="json-textarea"
+              readonly
               :auto-size="{ minRows: 4, maxRows: 10 }"
             />
+            <div v-if="chromaItems.length" class="chroma-list">
+              <div v-for="chroma in chromaItems" :key="chroma.key" class="chroma-item">
+                <a-image
+                  v-if="chroma.imageUrl"
+                  :src="chroma.imageUrl"
+                  :width="96"
+                  :height="96"
+                  class="chroma-image"
+                />
+                <div class="chroma-meta">
+                  <div class="chroma-name">{{ chroma.name || chroma.id || '-' }}</div>
+                  <div v-if="chroma.colors.length" class="chroma-colors">
+                    <span
+                      v-for="color in chroma.colors"
+                      :key="color"
+                      class="chroma-color"
+                      :style="{ backgroundColor: color }"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </a-form-item>
         </a-col>
         <a-col :span="24">
@@ -281,6 +322,8 @@ import type { FormRequestMapping } from '@/hooks/form'
 import type { ColProps } from 'ant-design-vue'
 import { createLolSkin, updateLolSkin } from '@/api/lol/skin'
 import type { LolSkinDTO, LolSkinPageVO } from '@/api/lol/skin/types'
+import { pageSkinline } from '@/api/lol/skinline'
+import type { SkinlinePageVO } from '@/api/lol/skinline/types'
 import { toBreadjAssetUrl } from '@/utils/community-dragon-utils'
 import { useLolSkinDictPresentation } from './lol-skin-dict-presentation'
 
@@ -288,6 +331,13 @@ const labelCol: ColProps = { sm: { span: 24 }, md: { span: 8 } }
 const wrapperCol: ColProps = { sm: { span: 24 }, md: { span: 15 } }
 const fullLabelCol: ColProps = { sm: { span: 24 }, md: { span: 3 } }
 const fullWrapperCol: ColProps = { sm: { span: 24 }, md: { span: 20 } }
+
+interface ChromaJsonItem {
+  id?: number | string
+  name?: string
+  chromaPath?: string
+  colors?: string[]
+}
 
 const emits = defineEmits<{
   (e: 'submit-success'): void
@@ -335,6 +385,8 @@ const getDefaultFormModel = (): LolSkinDTO => ({
 })
 
 const formModel = reactive<LolSkinDTO>(getDefaultFormModel())
+const skinlineLoading = ref(false)
+const skinlineOptions = ref<SkinlinePageVO[]>([])
 const regionRarityIdValue = computed<string | undefined>({
   get: () => {
     if (formModel.regionRarityId === undefined || formModel.regionRarityId === null || formModel.regionRarityId === '') {
@@ -344,6 +396,20 @@ const regionRarityIdValue = computed<string | undefined>({
   },
   set: value => {
     formModel.regionRarityId = value
+  }
+})
+const skinlineIdList = computed<string[]>({
+  get: () => {
+    if (!formModel.skinlineIdSets) {
+      return []
+    }
+    return formModel.skinlineIdSets
+      .split(',')
+      .map(item => item.trim())
+      .filter(Boolean)
+  },
+  set: value => {
+    formModel.skinlineIdSets = value.length ? value.join(',') : undefined
   }
 })
 const emblemNameList = computed<string[]>({
@@ -358,6 +424,27 @@ const emblemNameList = computed<string[]>({
   },
   set: value => {
     formModel.emblemNames = value.length ? value.join(',') : undefined
+  }
+})
+
+const chromaItems = computed(() => {
+  if (!formModel.chromasJson) {
+    return []
+  }
+  try {
+    const chromas = JSON.parse(formModel.chromasJson)
+    if (!Array.isArray(chromas)) {
+      return []
+    }
+    return chromas.map((item: ChromaJsonItem, index: number) => ({
+      key: `${item.id || index}`,
+      id: item.id,
+      name: item.name,
+      colors: Array.isArray(item.colors) ? item.colors : [],
+      imageUrl: getAssetPreviewUrl(item.chromaPath)
+    }))
+  } catch {
+    return []
   }
 })
 
@@ -396,6 +483,20 @@ const filterDictOption = (input: string, option?: { name?: string }) => {
   return String(option?.name || '').toLowerCase().includes(input.toLowerCase())
 }
 
+const loadSkinlineOptions = () => {
+  if (skinlineOptions.value.length || skinlineLoading.value) {
+    return
+  }
+  skinlineLoading.value = true
+  pageSkinline({ current: 1, size: 1000, sort: 'riot_skinline_id,asc' })
+    .then(res => {
+      skinlineOptions.value = res.data.records || []
+    })
+    .finally(() => {
+      skinlineLoading.value = false
+    })
+}
+
 const resetFormModel = () => {
   Object.assign(formModel, getDefaultFormModel())
 }
@@ -430,6 +531,7 @@ const fillFormModel = (record?: LolSkinPageVO) => {
 defineExpose({
   open(newFormAction: FormAction, record?: LolSkinPageVO) {
     openModal()
+    loadSkinlineOptions()
     resetFields()
     resetFormModel()
     if (newFormAction === FormAction.CREATE) {
@@ -461,6 +563,46 @@ defineExpose({
 
 .json-textarea {
   font-family: Consolas, Monaco, 'Courier New', monospace;
+}
+
+.chroma-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.chroma-item {
+  min-width: 0;
+}
+
+.chroma-image :deep(.ant-image-img) {
+  object-fit: contain;
+}
+
+.chroma-meta {
+  margin-top: 6px;
+}
+
+.chroma-name {
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chroma-colors {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.chroma-color {
+  width: 14px;
+  height: 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 50%;
 }
 
 .dict-option {
