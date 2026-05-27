@@ -22,7 +22,10 @@
         <a-typography-text copyable>{{ record.name }}</a-typography-text>
       </template>
       <template v-if="column.key === 'regionRarityId'">
-        <a-tooltip v-if="getCnRarityIconUrl(record.regionRarityId)" :title="getCnRarityName(record.regionRarityId)">
+        <a-tooltip
+          v-if="getCnRarityIconUrl(record.regionRarityId)"
+          :title="getCnRarityName(record.regionRarityId)"
+        >
           <img
             class="rarity-icon"
             :src="getCnRarityIconUrl(record.regionRarityId)"
@@ -32,7 +35,10 @@
         <span v-else>{{ getCnRarityName(record.regionRarityId) || '-' }}</span>
       </template>
       <template v-if="column.key === 'rarity'">
-        <a-tooltip v-if="getGlobalRarityIconUrl(record.rarity)" :title="getGlobalRarityName(record.rarity)">
+        <a-tooltip
+          v-if="getGlobalRarityIconUrl(record.rarity)"
+          :title="getGlobalRarityName(record.rarity)"
+        >
           <img
             class="rarity-icon"
             :src="getGlobalRarityIconUrl(record.rarity)"
@@ -184,7 +190,8 @@ const getGlobalRarityIconUrl = (value?: DictValue | null) => {
   return toBreadjAssetUrl(getGlobalRarityIconPath(dictItem, value))
 }
 const getCnRarityName = (value?: DictValue | null) => getRarityName(cnRarityDictItems, value)
-const getGlobalRarityName = (value?: DictValue | null) => getRarityName(globalRarityDictItems, value)
+const getGlobalRarityName = (value?: DictValue | null) =>
+  getRarityName(globalRarityDictItems, value)
 
 const columns: ProColumns[] = [
   {

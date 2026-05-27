@@ -310,6 +310,20 @@ const resetFormModel = () => {
   Object.assign(formModel, getDefaultFormModel())
 }
 
+const formatJsonText = (value?: unknown) => {
+  if (value === undefined || value === null || value === '') {
+    return value as string | undefined
+  }
+  if (typeof value !== 'string') {
+    return JSON.stringify(value, null, 2)
+  }
+  try {
+    return JSON.stringify(JSON.parse(value), null, 2)
+  } catch {
+    return value
+  }
+}
+
 const fillFormModel = (record?: LolSkinPageVO) => {
   if (!record) {
     return
@@ -319,6 +333,8 @@ const fillFormModel = (record?: LolSkinPageVO) => {
   Object.keys(getDefaultFormModel()).forEach(key => {
     model[key] = source[key]
   })
+  formModel.chromasJson = formatJsonText(record.chromasJson)
+  formModel.questSkinInfoJson = formatJsonText(record.questSkinInfoJson)
 }
 
 defineExpose({
