@@ -50,12 +50,18 @@
         </a-col>
         <a-col :span="24">
           <a-form-item label="中文描述" :label-col="fullLabelCol" :wrapper-col="fullWrapperCol">
-            <a-textarea v-model:value="formModel.description" :auto-size="{ minRows: 2, maxRows: 5 }" />
+            <a-textarea
+              v-model:value="formModel.description"
+              :auto-size="{ minRows: 2, maxRows: 5 }"
+            />
           </a-form-item>
         </a-col>
         <a-col :span="24">
           <a-form-item label="英文描述" :label-col="fullLabelCol" :wrapper-col="fullWrapperCol">
-            <a-textarea v-model:value="formModel.descriptionEng" :auto-size="{ minRows: 2, maxRows: 5 }" />
+            <a-textarea
+              v-model:value="formModel.descriptionEng"
+              :auto-size="{ minRows: 2, maxRows: 5 }"
+            />
           </a-form-item>
         </a-col>
 
@@ -80,7 +86,10 @@
                 :name="item.name"
               >
                 <span class="dict-option">
-                  <img v-if="getCnRarityIconUrl(item.value)" :src="getCnRarityIconUrl(item.value)" />
+                  <img
+                    v-if="getCnRarityIconUrl(item.value)"
+                    :src="getCnRarityIconUrl(item.value)"
+                  />
                   <span>{{ item.name }}</span>
                 </span>
               </a-select-option>
@@ -105,7 +114,10 @@
                 :name="item.name"
               >
                 <span class="dict-option">
-                  <img v-if="getGlobalRarityIconUrl(item.value)" :src="getGlobalRarityIconUrl(item.value)" />
+                  <img
+                    v-if="getGlobalRarityIconUrl(item.value)"
+                    :src="getGlobalRarityIconUrl(item.value)"
+                  />
                   <span>{{ item.name }}</span>
                 </span>
               </a-select-option>
@@ -302,7 +314,11 @@
           </a-form-item>
         </a-col>
         <a-col :span="24">
-          <a-form-item label="任务皮肤 JSON" :label-col="fullLabelCol" :wrapper-col="fullWrapperCol">
+          <a-form-item
+            label="任务皮肤 JSON"
+            :label-col="fullLabelCol"
+            :wrapper-col="fullWrapperCol"
+          >
             <a-textarea
               v-model:value="formModel.questSkinInfoJson"
               class="json-textarea"
@@ -389,7 +405,11 @@ const skinlineLoading = ref(false)
 const skinlineOptions = ref<SkinlinePageVO[]>([])
 const regionRarityIdValue = computed<string | undefined>({
   get: () => {
-    if (formModel.regionRarityId === undefined || formModel.regionRarityId === null || formModel.regionRarityId === '') {
+    if (
+      formModel.regionRarityId === undefined ||
+      formModel.regionRarityId === null ||
+      formModel.regionRarityId === ''
+    ) {
       return undefined
     }
     return String(formModel.regionRarityId)
@@ -462,12 +482,15 @@ const { submitLoading, validateAndSubmit, resetFields } = useAdminForm(
 )
 
 const handleSubmit = () => {
-  validateAndSubmit({ ...formModel }, {
-    onSuccess: () => {
-      closeModal()
-      emits('submit-success')
+  validateAndSubmit(
+    { ...formModel },
+    {
+      onSuccess: () => {
+        closeModal()
+        emits('submit-success')
+      }
     }
-  })
+  )
 }
 
 const handleClose = () => {
@@ -480,7 +503,9 @@ const getAssetPreviewUrl = (path?: string) => {
 }
 
 const filterDictOption = (input: string, option?: { name?: string }) => {
-  return String(option?.name || '').toLowerCase().includes(input.toLowerCase())
+  return String(option?.name || '')
+    .toLowerCase()
+    .includes(input.toLowerCase())
 }
 
 const loadSkinlineOptions = () => {
@@ -488,7 +513,7 @@ const loadSkinlineOptions = () => {
     return
   }
   skinlineLoading.value = true
-  pageSkinline({ current: 1, size: 1000, sort: 'riot_skinline_id,asc' })
+  pageSkinline({ current: 1, size: 100, sort: 'riot_skinline_id,asc' })
     .then(res => {
       skinlineOptions.value = res.data.records || []
     })
