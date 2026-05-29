@@ -25,9 +25,8 @@ export function resolveResourceUrl(url?: string) {
   }
 
   const resourcePath = rawUrl.replace(/\\/g, '/').replace(/^\/+/, '')
-  const communityDragonPathIndex = resourcePath.indexOf(COMMUNITY_DRAGON_RESOURCE_PATH)
-  if (communityDragonPathIndex >= 0) {
-    return joinUrl(COMMUNITY_DRAGON_DOMAIN, resourcePath.substring(communityDragonPathIndex))
+  if (resourcePath.includes(COMMUNITY_DRAGON_RESOURCE_PATH)) {
+    return joinUrl(COMMUNITY_DRAGON_DOMAIN, resourcePath)
   }
 
   return joinUrl(OSS_DOMAIN, resourcePath)
