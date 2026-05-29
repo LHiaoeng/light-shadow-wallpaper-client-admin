@@ -1,5 +1,5 @@
 const COMMUNITY_DRAGON_DOMAIN = 'https://communitydragon.breadj.com'
-const COMMUNITY_DRAGON_RESOURCE_PREFIX = 'plugins/rcp-be-lol-game-data/'
+const COMMUNITY_DRAGON_RESOURCE_PATH = 'plugins/rcp-be-lol-game-data'
 const OSS_DOMAIN = import.meta.env.VITE_IMAGE_DOMAIN || 'https://oss.breadj.com'
 
 function joinUrl(domain: string, path: string) {
@@ -25,8 +25,9 @@ export function resolveResourceUrl(url?: string) {
   }
 
   const resourcePath = rawUrl.replace(/\\/g, '/').replace(/^\/+/, '')
-  if (resourcePath.startsWith(COMMUNITY_DRAGON_RESOURCE_PREFIX)) {
-    return joinUrl(COMMUNITY_DRAGON_DOMAIN, resourcePath)
+  const communityDragonPathIndex = resourcePath.indexOf(COMMUNITY_DRAGON_RESOURCE_PATH)
+  if (communityDragonPathIndex >= 0) {
+    return joinUrl(COMMUNITY_DRAGON_DOMAIN, resourcePath.substring(communityDragonPathIndex))
   }
 
   return joinUrl(OSS_DOMAIN, resourcePath)
