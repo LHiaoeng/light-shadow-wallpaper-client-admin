@@ -3,6 +3,7 @@ import { message } from 'ant-design-vue'
 import type { UploadProps } from 'ant-design-vue'
 import { uploadWallpaper } from '@/api/wallpaper/wallpaper'
 import { OssProviderEnum } from '@/api/oss/types'
+import { resolveResourceUrl } from '@/utils/resource-url-utils'
 
 const props = withDefaults(
   defineProps<{
@@ -31,11 +32,7 @@ const modelValue = computed({
 })
 
 const previewUrl = computed(() => {
-  const url = modelValue.value?.trim()
-  if (!url) {
-    return ''
-  }
-  return url.startsWith('//') ? `https:${url}` : url
+  return resolveResourceUrl(modelValue.value)
 })
 
 const customRequest: UploadProps['customRequest'] = options => {

@@ -10,6 +10,7 @@ import {
 import FileAnalyzer from '@/components/FileAnalyzer/index.vue'
 import type { WallpaperUrlDTO } from '@/api/wallpaper/wallpaperUrl/types'
 import { message } from 'ant-design-vue'
+import { resolveResourceUrl } from '@/utils/resource-url-utils'
 
 const { title, visible, openModal, closeModal } = useModal()
 
@@ -101,6 +102,8 @@ function formatSize(bytes: number): string {
   }
 }
 
+const getResourceUrl = (url?: string) => resolveResourceUrl(url)
+
 const fileInfo = ref<WallpaperUrlDTO | null>(null)
 const fileUrl = ref<string>('')
 
@@ -151,10 +154,15 @@ defineExpose({
                   <img
                     v-if="item.fileType === 1"
                     :alt="wallpaper?.title"
-                    :src="item.url"
+                    :src="getResourceUrl(item.url)"
                     referrerpolicy="no-referrer"
                   />
-                  <video v-else :src="item.url" :poster="item.poster" controls />
+                  <video
+                    v-else
+                    :src="getResourceUrl(item.url)"
+                    :poster="getResourceUrl(item.poster)"
+                    controls
+                  />
                 </div>
               </div>
             </template>
@@ -181,7 +189,7 @@ defineExpose({
                 <a-descriptions size="small" :column="1">
                   <a-descriptions-item label="地址">
                     <a-typography-link
-                      :href="item.url"
+                      :href="getResourceUrl(item.url)"
                       target="_blank"
                       :copyable="{ tooltip: false }"
                       :ellipsis="true"
@@ -193,7 +201,7 @@ defineExpose({
                   </a-descriptions-item>
                   <a-descriptions-item label="缩略图">
                     <a-typography-link
-                      :href="item.poster"
+                      :href="getResourceUrl(item.poster)"
                       target="_blank"
                       :copyable="{ tooltip: false }"
                       :ellipsis="true"

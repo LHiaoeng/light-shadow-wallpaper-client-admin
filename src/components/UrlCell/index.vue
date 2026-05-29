@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { message } from 'ant-design-vue'
+import { resolveResourceUrl } from '@/utils/resource-url-utils'
 
 interface Props {
   url?: string
@@ -12,11 +13,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const hrefUrl = computed(() => {
-  const url = props.url?.trim()
-  if (!url) {
-    return ''
-  }
-  return url.startsWith('//') ? `https:${url}` : url
+  return resolveResourceUrl(props.url)
 })
 
 // Copy to Clipboard Function
