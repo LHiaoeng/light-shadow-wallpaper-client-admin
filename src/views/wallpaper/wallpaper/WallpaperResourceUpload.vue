@@ -94,7 +94,16 @@ const customRequest: UploadProps['customRequest'] = options => {
         :width="320"
         referrerpolicy="no-referrer"
       />
-      <video v-else :src="previewUrl" controls muted class="video-preview" />
+      <video
+        v-else
+        :src="previewUrl"
+        autoplay
+        controls
+        loop
+        muted
+        playsinline
+        class="video-preview"
+      />
     </div>
   </div>
 </template>

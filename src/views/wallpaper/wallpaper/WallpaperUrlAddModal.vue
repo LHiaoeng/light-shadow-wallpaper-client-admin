@@ -161,7 +161,11 @@ defineExpose({
                     v-else
                     :src="getResourceUrl(item.url)"
                     :poster="getResourceUrl(item.poster)"
+                    autoplay
                     controls
+                    loop
+                    muted
+                    playsinline
                   />
                 </div>
               </div>
