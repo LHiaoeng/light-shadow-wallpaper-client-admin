@@ -213,6 +213,14 @@
           </a-form-item>
         </a-col>
         <a-col :xl="12" :md="12" :sm="24">
+          <a-form-item label="老版载入图">
+            <a-input v-model:value="formModel.loadScreenVintagePath" />
+            <div v-if="getAssetPreviewUrl(formModel.loadScreenVintagePath)" class="asset-preview">
+              <a-image :src="getAssetPreviewUrl(formModel.loadScreenVintagePath)" :width="96" />
+            </div>
+          </a-form-item>
+        </a-col>
+        <a-col :xl="12" :md="12" :sm="24">
           <a-form-item label="稀有度图标">
             <a-input v-model:value="formModel.rarityGemPath" />
             <div v-if="getAssetPreviewUrl(formModel.rarityGemPath)" class="asset-preview">
@@ -228,9 +236,111 @@
             </div>
           </a-form-item>
         </a-col>
+        <a-col :xl="12" :md="12" :sm="24">
+          <a-form-item label="原画视频">
+            <a-input v-model:value="formModel.splashVideoPath" />
+            <div v-if="getAssetPreviewUrl(formModel.splashVideoPath)" class="asset-link">
+              <a
+                :href="getAssetPreviewUrl(formModel.splashVideoPath)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                打开视频
+              </a>
+            </div>
+          </a-form-item>
+        </a-col>
+        <a-col :xl="12" :md="12" :sm="24">
+          <a-form-item label="预览视频">
+            <a-input v-model:value="formModel.previewVideoUrl" />
+            <div v-if="getAssetPreviewUrl(formModel.previewVideoUrl)" class="asset-link">
+              <a
+                :href="getAssetPreviewUrl(formModel.previewVideoUrl)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                打开视频
+              </a>
+            </div>
+          </a-form-item>
+        </a-col>
+        <a-col :xl="12" :md="12" :sm="24">
+          <a-form-item label="收藏页视频">
+            <a-input v-model:value="formModel.collectionSplashVideoPath" />
+            <div v-if="getAssetPreviewUrl(formModel.collectionSplashVideoPath)" class="asset-link">
+              <a
+                :href="getAssetPreviewUrl(formModel.collectionSplashVideoPath)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                打开视频
+              </a>
+            </div>
+          </a-form-item>
+        </a-col>
+        <a-col :xl="12" :md="12" :sm="24">
+          <a-form-item label="卡片悬停视频">
+            <a-input v-model:value="formModel.collectionCardHoverVideoPath" />
+            <div
+              v-if="getAssetPreviewUrl(formModel.collectionCardHoverVideoPath)"
+              class="asset-link"
+            >
+              <a
+                :href="getAssetPreviewUrl(formModel.collectionCardHoverVideoPath)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                打开视频
+              </a>
+            </div>
+          </a-form-item>
+        </a-col>
 
         <a-col :span="24">
           <a-divider orientation="left">关联与原始数据</a-divider>
+        </a-col>
+        <a-col :xl="8" :md="12" :sm="24">
+          <a-form-item label="任务母皮肤ID">
+            <a-input-number v-model:value="formModel.questSkinParentId" style="width: 100%" />
+          </a-form-item>
+        </a-col>
+        <a-col :xl="8" :md="12" :sm="24">
+          <a-form-item label="任务阶段">
+            <a-input-number v-model:value="formModel.questSkinStage" style="width: 100%" />
+          </a-form-item>
+        </a-col>
+        <a-col :xl="8" :md="12" :sm="24">
+          <a-form-item label="阶段短名称">
+            <a-input v-model:value="formModel.questSkinShortName" />
+          </a-form-item>
+        </a-col>
+        <a-col :xl="12" :md="12" :sm="24">
+          <a-form-item label="英雄数据源">
+            <a-input v-model:value="formModel.championDataSourcePath" />
+            <div v-if="getDataSourceUrl(formModel.championDataSourcePath)" class="asset-link">
+              <a
+                :href="getDataSourceUrl(formModel.championDataSourcePath)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                打开英雄数据
+              </a>
+            </div>
+          </a-form-item>
+        </a-col>
+        <a-col :xl="12" :md="12" :sm="24">
+          <a-form-item label="皮肤数据源">
+            <a-input v-model:value="formModel.skinDataSourcePath" />
+            <div v-if="getDataSourceUrl(formModel.skinDataSourcePath)" class="asset-link">
+              <a
+                :href="getDataSourceUrl(formModel.skinDataSourcePath)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                打开皮肤数据
+              </a>
+            </div>
+          </a-form-item>
         </a-col>
         <a-col :xl="12" :md="12" :sm="24">
           <a-form-item label="皮肤系列">
@@ -392,12 +502,22 @@ const getDefaultFormModel = (): LolSkinDTO => ({
   uncenteredSplashPath: undefined,
   tilePath: undefined,
   loadScreenPath: undefined,
+  loadScreenVintagePath: undefined,
   rarityGemPath: undefined,
   chromaPath: undefined,
+  splashVideoPath: undefined,
+  previewVideoUrl: undefined,
+  collectionSplashVideoPath: undefined,
+  collectionCardHoverVideoPath: undefined,
   skinlineIdSets: undefined,
   emblemNames: undefined,
   chromasJson: undefined,
-  questSkinInfoJson: undefined
+  questSkinInfoJson: undefined,
+  questSkinParentId: undefined,
+  questSkinStage: undefined,
+  questSkinShortName: undefined,
+  championDataSourcePath: undefined,
+  skinDataSourcePath: undefined
 })
 
 const formModel = reactive<LolSkinDTO>(getDefaultFormModel())
@@ -502,6 +622,10 @@ const getAssetPreviewUrl = (path?: string) => {
   return toBreadjAssetUrl(path, formModel.isPbeOnly === 1 ? 'pbe' : 'latest')
 }
 
+const getDataSourceUrl = (path?: string) => {
+  return toBreadjAssetUrl(path, formModel.isPbeOnly === 1 ? 'pbe' : 'latest')
+}
+
 const filterDictOption = (input: string, option?: { name?: string }) => {
   return String(option?.name || '')
     .toLowerCase()
@@ -575,7 +699,8 @@ defineExpose({
   margin: 8px 0 18px;
 }
 
-.asset-preview {
+.asset-preview,
+.asset-link {
   margin-top: 8px;
   min-height: 36px;
 }

@@ -7,7 +7,7 @@
     row-key="id"
     :request="tableRequest"
     :columns="columns"
-    :scroll="{ x: 1900 }"
+    :scroll="{ x: 2100 }"
   >
     <template #toolBarRender>
       <new-button v-if="hasPermission('lol:skin:add')" @click="handleNew" />
@@ -77,6 +77,34 @@
       <template v-if="column.key === 'isLegacyGlobal'">
         <a-tag v-if="record.isLegacyGlobal === 1" color="red">直营服绝版</a-tag>
         <span v-else>-</span>
+      </template>
+      <template v-if="column.key === 'dataSource'">
+        <a-space>
+          <a
+            v-if="getDataSourceUrl(record.championDataSourcePath, record)"
+            :href="getDataSourceUrl(record.championDataSourcePath, record)"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            英雄
+          </a>
+          <a
+            v-if="getDataSourceUrl(record.skinDataSourcePath, record)"
+            :href="getDataSourceUrl(record.skinDataSourcePath, record)"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            皮肤
+          </a>
+          <span
+            v-if="
+              !getDataSourceUrl(record.championDataSourcePath, record) &&
+              !getDataSourceUrl(record.skinDataSourcePath, record)
+            "
+          >
+            -
+          </span>
+        </a-space>
       </template>
       <template v-if="column.key === 'operate'">
         <operation-group>
@@ -153,6 +181,10 @@ const handleDelete = (record: LolSkinPageVO) => {
 const getPreviewUrl = (record: LolSkinPageVO) => {
   const version = record.isPbeOnly === 1 ? 'pbe' : 'latest'
   return toBreadjAssetUrl(record.tilePath, version) || toBreadjAssetUrl(record.splashPath, version)
+}
+
+const getDataSourceUrl = (path: string | undefined, record: LolSkinPageVO) => {
+  return toBreadjAssetUrl(path, record.isPbeOnly === 1 ? 'pbe' : 'latest')
 }
 
 const {
@@ -247,6 +279,12 @@ const columns: ProColumns[] = [
     dataIndex: 'emblemNames',
     width: 160,
     ellipsis: true
+  },
+  {
+    key: 'dataSource',
+    title: '数据源',
+    dataIndex: 'championDataSourcePath',
+    width: 120
   },
   {
     title: '上架时间',

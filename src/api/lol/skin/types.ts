@@ -22,12 +22,22 @@ export interface LolSkinDTO {
   uncenteredSplashPath?: string
   tilePath?: string
   loadScreenPath?: string
+  loadScreenVintagePath?: string
   rarityGemPath?: string
   chromaPath?: string
+  splashVideoPath?: string
+  previewVideoUrl?: string
+  collectionSplashVideoPath?: string
+  collectionCardHoverVideoPath?: string
   skinlineIdSets?: string
   emblemNames?: string
   chromasJson?: string
   questSkinInfoJson?: string
+  questSkinParentId?: number
+  questSkinStage?: number
+  questSkinShortName?: string
+  championDataSourcePath?: string
+  skinDataSourcePath?: string
 }
 
 export interface LolSkinQO {
