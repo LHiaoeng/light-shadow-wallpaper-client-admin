@@ -34,6 +34,12 @@ export interface PrestigeChromaDTO {
   isNew?: number
 }
 
+export interface PrestigeChromaBatchUpdateDTO {
+  ids: number[]
+  gameVer: string
+  isNew: number
+}
+
 export interface PrestigeChromaQO {
   gameVer?: string
   heroId?: number

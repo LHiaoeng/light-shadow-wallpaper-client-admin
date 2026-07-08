@@ -37,7 +37,7 @@
           </a-form-item>
         </a-col>
         <a-col :xl="12" :md="12" :sm="24">
-          <a-form-item label="臻彩英文名">
+          <a-form-item label="臻彩名称英文">
             <a-input v-model:value="formModel.itemNameEng" />
           </a-form-item>
         </a-col>
@@ -116,7 +116,7 @@
         </a-col>
         <a-col :xl="8" :md="12" :sm="24">
           <a-form-item label="排序">
-            <a-input-number v-model:value="formModel.rank" style="width: 100%" />
+            <a-input-number v-model:value="formModel.rank" disabled style="width: 100%" />
           </a-form-item>
         </a-col>
         <a-col :xl="8" :md="12" :sm="24">

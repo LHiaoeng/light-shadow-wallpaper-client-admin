@@ -8,27 +8,82 @@
     :request="tableRequest"
     :columns="columns"
     :scroll="{ x: 2300 }"
+    :row-selection="{}"
   >
+    <template #tableAlertOptionRender="{ intl, onCleanSelected, selectedRowKeys }">
+      <a-space :size="16">
+        <a
+          v-if="hasPermission('lol:prestige-chroma:edit')"
+          @click="handleOpenBatchModal(selectedRowKeys, onCleanSelected)"
+        >
+          批量设置
+        </a>
+        <a @click="onCleanSelected">
+          {{ intl.getMessage('alert.clear', '清空') }}
+        </a>
+      </a-space>
+    </template>
+
     <template #toolBarRender>
       <a-space>
         <new-button v-if="hasPermission('lol:prestige-chroma:add')" @click="handleNew" />
-        <a-button
+        <a-popconfirm
           v-if="hasPermission('lol:prestige-chroma:sync')"
-          type="primary"
-          :loading="syncLoading"
-          @click="handleSync"
+          title="确认开始同步臻彩数据吗？"
+          ok-text="确认"
+          cancel-text="取消"
+          :disabled="syncLoading"
+          @confirm="handleSync"
         >
-          同步臻彩
-        </a-button>
+          <a-button type="primary" :loading="syncLoading">同步臻彩</a-button>
+        </a-popconfirm>
       </a-space>
     </template>
 
     <template #bodyCell="{ column, record }">
+      <template v-if="column.key === 'chromaImage'">
+        <img
+          v-if="record.instanceId"
+          class="chroma-image"
+          :src="getChromaImageUrl(record.instanceId)"
+          :alt="record.itemName || '臻彩图片'"
+          @click="handleOpenChromaPreview(record)"
+        />
+        <span v-else>-</span>
+      </template>
       <template v-if="column.key === 'itemName'">
-        <a-typography-text copyable>{{ record.itemName }}</a-typography-text>
+        <a-typography-text copyable class="name-text">
+          {{ record.itemName || '-' }}
+        </a-typography-text>
+      </template>
+      <template v-if="column.key === 'itemNameEng'">
+        <a-typography-text copyable class="name-text">
+          {{ record.itemNameEng || '-' }}
+        </a-typography-text>
       </template>
       <template v-if="column.key === 'sourceSkinName'">
         <a-typography-text copyable>{{ record.sourceSkinName || '-' }}</a-typography-text>
+      </template>
+      <template v-if="column.key === 'categoryName'">
+        <a-popover v-if="record.tagImgUrl" placement="right" trigger="hover">
+          <template #content>
+            <img
+              class="category-icon-preview"
+              :src="record.tagImgUrl"
+              :alt="record.categoryName || '分类图标'"
+            />
+          </template>
+          <a-space :size="6">
+            <img
+              class="category-icon"
+              :src="record.tagImgUrl"
+              :alt="record.categoryName || '分类图标'"
+            />
+            <span>{{ record.categoryName || '-' }}</span>
+          </a-space>
+        </a-popover>
+        <span v-else-if="record.categoryName">{{ record.categoryName }}</span>
+        <span v-else>-</span>
       </template>
       <template v-if="column.key === 'isNew'">
         <a-tag :color="record.isNew === 1 ? 'orange' : 'default'">
@@ -48,12 +103,47 @@
   </pro-table>
 
   <prestige-chroma-form-modal ref="formModalRef" @submit-success="reloadTable" />
+
+  <a-image
+    v-if="chromaPreviewUrl"
+    :src="chromaPreviewUrl"
+    :preview="{
+      visible: chromaPreviewVisible,
+      onVisibleChange: handleChromaPreviewVisibleChange
+    }"
+    :style="{ display: 'none' }"
+  />
+
+  <a-modal
+    title="批量设置"
+    :visible="batchModalVisible"
+    :mask-closable="false"
+    :confirm-loading="batchSubmitLoading"
+    @ok="handleBatchSubmit"
+    @cancel="handleBatchClose"
+  >
+    <a-form :model="batchFormModel" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
+      <a-form-item label="选中数量">
+        <span>{{ batchSelectedIds.length }}</span>
+      </a-form-item>
+      <a-form-item label="游戏版本" required>
+        <a-input v-model:value="batchFormModel.gameVer" placeholder="例如 Ver 26.13" />
+      </a-form-item>
+      <a-form-item label="是否新增" required>
+        <a-select v-model:value="batchFormModel.isNew">
+          <a-select-option :value="1">是</a-select-option>
+          <a-select-option :value="0">否</a-select-option>
+        </a-select>
+      </a-form-item>
+    </a-form>
+  </a-modal>
 </template>
 
 <script setup lang="ts">
 import ProTable from '#/table'
 import type { ProColumns } from '#/table'
 import type { ProTableInstanceExpose, TableRequest } from '#/table'
+import { message } from 'ant-design-vue'
 import PrestigeChromaPageSearch from './PrestigeChromaPageSearch.vue'
 import PrestigeChromaFormModal from './PrestigeChromaFormModal.vue'
 import { NewButton, DeleteTextButton } from '@/components/Button'
@@ -62,6 +152,7 @@ import { useAuthorize } from '@/hooks/permission'
 import { mergePageParam } from '@/utils/page-utils'
 import { doRequest } from '@/utils/axios/request'
 import {
+  batchUpdatePrestigeChromaBasic,
   deletePrestigeChroma,
   pagePrestigeChroma,
   syncPrestigeChroma
@@ -75,6 +166,16 @@ const { hasPermission } = useAuthorize()
 const tableRef = ref<ProTableInstanceExpose>()
 const formModalRef = ref<InstanceType<typeof PrestigeChromaFormModal>>()
 const syncLoading = ref(false)
+const batchModalVisible = ref(false)
+const batchSubmitLoading = ref(false)
+const batchSelectedIds = ref<number[]>([])
+const chromaPreviewVisible = ref(false)
+const chromaPreviewUrl = ref('')
+const batchFormModel = reactive({
+  gameVer: '',
+  isNew: 1
+})
+let cleanSelectedRows: (() => void) | undefined
 
 let searchParams: PrestigeChromaQO = {}
 
@@ -84,9 +185,6 @@ const reloadTable = (resetPageIndex?: boolean) => {
 
 const tableRequest: TableRequest = (params, sorter, filter) => {
   const pageParam = mergePageParam(params, sorter, filter)
-  if (!pageParam.sort || pageParam.sort.length === 0) {
-    pageParam.sort = ['rank,desc', 'skin_id,desc']
-  }
   return pagePrestigeChroma({ ...pageParam, ...searchParams })
 }
 
@@ -120,6 +218,75 @@ const handleSync = () => {
   })
 }
 
+const handleOpenBatchModal = (
+  selectedRowKeys: Array<number | string>,
+  onCleanSelected: () => void
+) => {
+  const ids = selectedRowKeys.map(Number).filter(id => Number.isFinite(id))
+  if (ids.length === 0) {
+    message.warning('请选择需要批量设置的臻彩皮肤')
+    return
+  }
+
+  batchSelectedIds.value = ids
+  batchFormModel.gameVer = ''
+  batchFormModel.isNew = 1
+  cleanSelectedRows = onCleanSelected
+  batchModalVisible.value = true
+}
+
+const handleBatchClose = () => {
+  batchModalVisible.value = false
+  batchSubmitLoading.value = false
+}
+
+const handleBatchSubmit = () => {
+  if (!batchFormModel.gameVer?.trim()) {
+    message.warning('请输入游戏版本')
+    return
+  }
+
+  batchSubmitLoading.value = true
+  doRequest(
+    batchUpdatePrestigeChromaBasic({
+      ids: batchSelectedIds.value,
+      gameVer: batchFormModel.gameVer.trim(),
+      isNew: batchFormModel.isNew
+    }),
+    {
+      successMessage: '批量设置成功',
+      onSuccess: () => {
+        handleBatchClose()
+        cleanSelectedRows?.()
+        reloadTable()
+      },
+      onFinally: () => {
+        batchSubmitLoading.value = false
+      }
+    }
+  )
+}
+
+const getChromaImageUrl = (instanceId: string) => {
+  return `https://game.gtimg.cn/images/lol/act/a20230715chromahub/skin/site5-${instanceId}.jpg`
+}
+
+const getChromaPreviewImageUrl = (instanceId: string) => {
+  return `https://game.gtimg.cn/images/lol/act/a20230715chromahub/skin/site3-${instanceId}.jpg`
+}
+
+const handleOpenChromaPreview = (record: PrestigeChromaPageVO) => {
+  if (!record.instanceId) {
+    return
+  }
+  chromaPreviewUrl.value = getChromaPreviewImageUrl(record.instanceId)
+  chromaPreviewVisible.value = true
+}
+
+const handleChromaPreviewVisibleChange = (visible: boolean) => {
+  chromaPreviewVisible.value = visible
+}
+
 const columns: ProColumns[] = [
   {
     title: '序号',
@@ -128,9 +295,47 @@ const columns: ProColumns[] = [
     customRender: ({ index }) => index + 1
   },
   {
-    title: '版本',
+    title: '排序',
+    dataIndex: 'rank',
+    width: 90
+  },
+  {
+    key: 'chromaImage',
+    title: '图片',
+    dataIndex: 'instanceId',
+    width: 96
+  },
+  {
+    key: 'categoryName',
+    title: '分类',
+    dataIndex: 'categoryName',
+    width: 150,
+    ellipsis: true
+  },
+  {
+    key: 'itemName',
+    title: '臻彩名称',
+    dataIndex: 'itemName',
+    width: 260,
+    ellipsis: true
+  },
+  {
+    title: '游戏版本',
     dataIndex: 'gameVer',
     width: 110
+  },
+  {
+    key: 'isNew',
+    title: '是否新增',
+    dataIndex: 'isNew',
+    width: 90
+  },
+  {
+    key: 'itemNameEng',
+    title: '臻彩名称英文',
+    dataIndex: 'itemNameEng',
+    width: 260,
+    ellipsis: true
   },
   {
     title: '英雄ID',
@@ -159,19 +364,6 @@ const columns: ProColumns[] = [
     title: '实例ID',
     dataIndex: 'instanceId',
     width: 230,
-    ellipsis: true
-  },
-  {
-    key: 'itemName',
-    title: '臻彩名称',
-    dataIndex: 'itemName',
-    width: 210,
-    ellipsis: true
-  },
-  {
-    title: '臻彩英文',
-    dataIndex: 'itemNameEng',
-    width: 220,
     ellipsis: true
   },
   {
@@ -205,27 +397,9 @@ const columns: ProColumns[] = [
     ellipsis: true
   },
   {
-    title: '分类',
-    dataIndex: 'categoryName',
-    width: 120,
-    ellipsis: true
-  },
-  {
     title: '标签ID',
     dataIndex: 'tagId',
     width: 110
-  },
-  {
-    title: '排序',
-    dataIndex: 'rank',
-    width: 90,
-    sorter: true
-  },
-  {
-    key: 'isNew',
-    title: '新增',
-    dataIndex: 'isNew',
-    width: 90
   },
   {
     key: 'operate',
@@ -236,3 +410,37 @@ const columns: ProColumns[] = [
   }
 ]
 </script>
+
+<style scoped>
+.chroma-image {
+  display: block;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  object-fit: cover;
+  object-position: top;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.name-text {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.category-icon-preview {
+  max-width: 160px;
+  max-height: 160px;
+  object-fit: contain;
+}
+</style>
