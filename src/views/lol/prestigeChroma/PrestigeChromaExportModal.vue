@@ -90,7 +90,7 @@ const formModel = reactive<{
   slideDurationSeconds: number
 }>({
   templateType: 'BLOG_POST',
-  fileFormat: 'MARKDOWN',
+  fileFormat: 'DOCX',
   title: '',
   slideDurationSeconds: 5
 })
@@ -132,7 +132,7 @@ const open = (options: OpenOptions) => {
   gameVersion.value = normalizeGameVersion(options.gameVersion)
   englishVersion.value = false
   formModel.templateType = 'BLOG_POST'
-  formModel.fileFormat = 'MARKDOWN'
+  formModel.fileFormat = 'DOCX'
   formModel.slideDurationSeconds = 5
   resetDefaultTitle()
   visible.value = true
