@@ -8,17 +8,17 @@
     :request="tableRequest"
     :columns="columns"
     :scroll="{ x: 2300 }"
-    :row-selection="{}"
+    :row-selection="{ selectedRowKeys, onChange: handleSelectionChange }"
   >
-    <template #tableAlertOptionRender="{ intl, onCleanSelected, selectedRowKeys }">
+    <template #tableAlertOptionRender="{ intl, onCleanSelected, selectedRowKeys: selectedKeys }">
       <a-space :size="16">
         <a
           v-if="hasPermission('lol:prestige-chroma:edit')"
-          @click="handleOpenBatchModal(selectedRowKeys, onCleanSelected)"
+          @click="handleOpenBatchModal(selectedKeys, onCleanSelected)"
         >
           批量设置
         </a>
-        <a @click="onCleanSelected">
+        <a @click="handleCleanSelected(onCleanSelected)">
           {{ intl.getMessage('alert.clear', '清空') }}
         </a>
       </a-space>
@@ -26,6 +26,14 @@
 
     <template #toolBarRender>
       <a-space>
+        <a-button
+          v-if="hasPermission('lol:prestige-chroma:export')"
+          :disabled="currentTotal === 0"
+          @click="handleOpenExportModal"
+        >
+          <template #icon><DownloadOutlined /></template>
+          导出文档
+        </a-button>
         <new-button v-if="hasPermission('lol:prestige-chroma:add')" @click="handleNew" />
         <a-popconfirm
           v-if="hasPermission('lol:prestige-chroma:sync')"
@@ -103,6 +111,7 @@
   </pro-table>
 
   <prestige-chroma-form-modal ref="formModalRef" @submit-success="reloadTable" />
+  <prestige-chroma-export-modal ref="exportModalRef" />
 
   <a-image
     v-if="chromaPreviewUrl"
@@ -146,6 +155,8 @@ import type { ProTableInstanceExpose, TableRequest } from '#/table'
 import { message } from 'ant-design-vue'
 import PrestigeChromaPageSearch from './PrestigeChromaPageSearch.vue'
 import PrestigeChromaFormModal from './PrestigeChromaFormModal.vue'
+import PrestigeChromaExportModal from './PrestigeChromaExportModal.vue'
+import { DownloadOutlined } from '@ant-design/icons-vue'
 import { NewButton, DeleteTextButton } from '@/components/Button'
 import { OperationGroup } from '@/components/Operation'
 import { useAuthorize } from '@/hooks/permission'
@@ -165,12 +176,16 @@ defineOptions({ name: 'PrestigeChromaPage' })
 const { hasPermission } = useAuthorize()
 const tableRef = ref<ProTableInstanceExpose>()
 const formModalRef = ref<InstanceType<typeof PrestigeChromaFormModal>>()
+const exportModalRef = ref<InstanceType<typeof PrestigeChromaExportModal>>()
 const syncLoading = ref(false)
 const batchModalVisible = ref(false)
 const batchSubmitLoading = ref(false)
 const batchSelectedIds = ref<number[]>([])
 const chromaPreviewVisible = ref(false)
 const chromaPreviewUrl = ref('')
+const selectedRowKeys = ref<Array<number | string>>([])
+const selectedRows = ref<PrestigeChromaPageVO[]>([])
+const currentTotal = ref(0)
 const batchFormModel = reactive({
   gameVer: '',
   isNew: 1
@@ -183,9 +198,17 @@ const reloadTable = (resetPageIndex?: boolean) => {
   tableRef.value?.actionRef?.reload(resetPageIndex)
 }
 
-const tableRequest: TableRequest = (params, sorter, filter) => {
+const clearSelectedRows = () => {
+  selectedRowKeys.value = []
+  selectedRows.value = []
+}
+
+const tableRequest: TableRequest = async (params, sorter, filter) => {
   const pageParam = mergePageParam(params, sorter, filter)
-  return pagePrestigeChroma({ ...pageParam, ...searchParams })
+  const result = await pagePrestigeChroma({ ...pageParam, ...searchParams })
+  currentTotal.value = result.data.total
+  clearSelectedRows()
+  return result
 }
 
 const searchTable = (params: PrestigeChromaQO) => {
@@ -195,6 +218,40 @@ const searchTable = (params: PrestigeChromaQO) => {
 
 const handleNew = () => {
   formModalRef.value?.open(FormAction.CREATE)
+}
+
+const handleSelectionChange = (keys: Array<number | string>, rows: PrestigeChromaPageVO[]) => {
+  selectedRowKeys.value = keys
+  selectedRows.value = rows
+}
+
+const handleCleanSelected = (onCleanSelected: () => void) => {
+  onCleanSelected()
+  clearSelectedRows()
+}
+
+const handleOpenExportModal = () => {
+  const ids = selectedRowKeys.value.map(Number).filter(id => Number.isFinite(id))
+  exportModalRef.value?.open({
+    selectedIds: ids,
+    query: { ...searchParams },
+    total: currentTotal.value,
+    gameVersion: resolveExportGameVersion(ids)
+  })
+}
+
+const resolveExportGameVersion = (ids: number[]) => {
+  if (ids.length === 0) {
+    return searchParams.gameVer
+  }
+  const versions = [
+    ...new Set(
+      selectedRows.value
+        .map(row => row.gameVer?.trim())
+        .filter((version): version is string => Boolean(version))
+    )
+  ]
+  return versions.length === 1 ? versions[0] : undefined
 }
 
 const handleEdit = (record: PrestigeChromaPageVO) => {
@@ -258,6 +315,7 @@ const handleBatchSubmit = () => {
       onSuccess: () => {
         handleBatchClose()
         cleanSelectedRows?.()
+        clearSelectedRows()
         reloadTable()
       },
       onFinally: () => {
@@ -295,9 +353,11 @@ const columns: ProColumns[] = [
     customRender: ({ index }) => index + 1
   },
   {
+    key: 'rankSort',
     title: '排序',
     dataIndex: 'rank',
-    width: 90
+    width: 90,
+    sorter: true
   },
   {
     key: 'chromaImage',

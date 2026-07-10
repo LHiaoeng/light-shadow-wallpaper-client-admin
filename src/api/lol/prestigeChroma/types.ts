@@ -40,6 +40,22 @@ export interface PrestigeChromaBatchUpdateDTO {
   isNew: number
 }
 
+export type PrestigeChromaExportScope = 'SELECTED' | 'FILTERED'
+export type PrestigeChromaTemplateType = 'BLOG_POST' | 'AI_VIDEO_SCRIPT'
+export type PrestigeChromaFileFormat = 'DOCX' | 'MARKDOWN'
+export type PrestigeChromaDocumentLanguage = 'ZH_CN' | 'EN_US'
+
+export interface PrestigeChromaExportDTO {
+  scope: PrestigeChromaExportScope
+  ids?: number[]
+  query?: PrestigeChromaQO
+  templateType: PrestigeChromaTemplateType
+  fileFormat: PrestigeChromaFileFormat
+  language: PrestigeChromaDocumentLanguage
+  title?: string
+  slideDurationSeconds?: number
+}
+
 export interface PrestigeChromaQO {
   gameVer?: string
   heroId?: number

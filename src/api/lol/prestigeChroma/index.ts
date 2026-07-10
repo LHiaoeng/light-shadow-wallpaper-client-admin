@@ -1,8 +1,10 @@
 import httpClient from '@/utils/axios'
 import type { ApiResult, PageResult } from '@/api/types'
+import type { AxiosResponse } from 'axios'
 import type {
   PrestigeChromaBatchUpdateDTO,
   PrestigeChromaDTO,
+  PrestigeChromaExportDTO,
   PrestigeChromaPageParam,
   PrestigeChromaPageVO
 } from './types'
@@ -31,4 +33,12 @@ export function deletePrestigeChroma(id: number) {
 
 export function syncPrestigeChroma() {
   return httpClient.post<ApiResult<void>>('/lol/prestige-chroma/sync')
+}
+
+export function exportPrestigeChromaDocument(dto: PrestigeChromaExportDTO) {
+  return httpClient.post<AxiosResponse<Blob>, PrestigeChromaExportDTO>(
+    '/lol/prestige-chroma/export-doc',
+    dto,
+    { responseType: 'blob', timeout: 0 }
+  )
 }
