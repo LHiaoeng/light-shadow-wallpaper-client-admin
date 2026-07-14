@@ -56,6 +56,17 @@ export interface PrestigeChromaExportDTO {
   slideDurationSeconds?: number
 }
 
+export type PrestigeChromaImageAssetType = 'LARGE' | 'MEDIUM' | 'SMALL' | 'CATEGORY_ICON'
+export type PrestigeChromaImageFilenameLanguage = 'ZH_CN' | 'EN_US'
+
+export interface PrestigeChromaImageDownloadDTO {
+  scope: PrestigeChromaExportScope
+  ids?: number[]
+  query?: PrestigeChromaQO
+  assetTypes: PrestigeChromaImageAssetType[]
+  language: PrestigeChromaImageFilenameLanguage
+}
+
 export interface PrestigeChromaQO {
   gameVer?: string
   heroId?: number
