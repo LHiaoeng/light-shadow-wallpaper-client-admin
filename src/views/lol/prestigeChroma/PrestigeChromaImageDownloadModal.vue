@@ -9,20 +9,18 @@
     @ok="handleSubmit"
     @cancel="handleClose"
   >
-    <a-alert :message="scopeMessage" type="info" show-icon style="margin-bottom: 20px">
-      <template #action>
-        <a-button
-          v-if="selectedIds.length === 0"
-          type="link"
-          size="small"
-          :loading="countRefreshing"
-          @click="refreshFilteredTotal"
-        >
-          <template #icon><ReloadOutlined /></template>
-          刷新数量
-        </a-button>
-      </template>
-    </a-alert>
+    <div class="scope-actions">
+      <a-alert :message="scopeMessage" type="info" show-icon class="scope-alert" />
+      <a-button
+        v-if="selectedIds.length === 0"
+        size="small"
+        :loading="countRefreshing"
+        @click="refreshFilteredTotal"
+      >
+        <template #icon><ReloadOutlined /></template>
+        刷新数量
+      </a-button>
+    </div>
 
     <a-form :model="formModel" :label-col="{ span: 7 }" :wrapper-col="{ span: 15 }">
       <a-form-item label="图片资源" required>
@@ -160,6 +158,18 @@ defineExpose({ open })
 </script>
 
 <style scoped>
+.scope-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.scope-alert {
+  flex: 1;
+  min-width: 0;
+}
+
 .field-hint {
   margin-top: 4px;
   color: rgba(0, 0, 0, 0.45);

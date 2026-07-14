@@ -33,4 +33,15 @@ assert.deepEqual(buildPrestigeChromaCountPageParam(snapshot), {
   current: 1,
   size: 1
 })
+
+const modalSource = fs.readFileSync(
+  path.resolve(__dirname, '../src/views/lol/prestigeChroma/PrestigeChromaImageDownloadModal.vue'),
+  'utf8'
+)
+assert.equal(
+  modalSource.includes('<template #action>'),
+  false,
+  'Ant Design Vue 3.2 Alert does not render an action slot'
+)
+assert.match(modalSource, /class="scope-actions"/)
 console.log('prestige chroma download state tests passed')
