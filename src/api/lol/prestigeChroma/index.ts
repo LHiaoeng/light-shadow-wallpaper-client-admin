@@ -5,6 +5,7 @@ import type {
   PrestigeChromaBatchUpdateDTO,
   PrestigeChromaDTO,
   PrestigeChromaExportDTO,
+  PrestigeChromaImageDownloadDTO,
   PrestigeChromaPageParam,
   PrestigeChromaPageVO,
   PrestigeChromaR2SyncRequest,
@@ -41,6 +42,14 @@ export function syncPrestigeChroma() {
 export function exportPrestigeChromaDocument(dto: PrestigeChromaExportDTO) {
   return httpClient.post<AxiosResponse<Blob>, PrestigeChromaExportDTO>(
     '/lol/prestige-chroma/export-doc',
+    dto,
+    { responseType: 'blob', timeout: 0 }
+  )
+}
+
+export function downloadPrestigeChromaImages(dto: PrestigeChromaImageDownloadDTO) {
+  return httpClient.post<AxiosResponse<Blob>, PrestigeChromaImageDownloadDTO>(
+    '/lol/prestige-chroma/images/download',
     dto,
     { responseType: 'blob', timeout: 0 }
   )

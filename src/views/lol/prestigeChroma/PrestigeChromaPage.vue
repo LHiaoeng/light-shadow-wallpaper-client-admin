@@ -34,6 +34,14 @@
           <template #icon><DownloadOutlined /></template>
           导出文档
         </a-button>
+        <a-button
+          v-if="hasPermission('lol:prestige-chroma:export')"
+          :disabled="currentTotal === 0"
+          @click="handleOpenImageDownloadModal"
+        >
+          <template #icon><DownloadOutlined /></template>
+          下载图片
+        </a-button>
         <prestige-chroma-hub-actions v-if="hasPermission('lol:prestige:hub-download')" />
         <a-button v-if="hasPermission('lol:prestige:r2-sync')" @click="handleOpenR2SyncModal">
           同步资源到 R2
@@ -116,6 +124,7 @@
 
   <prestige-chroma-form-modal ref="formModalRef" @submit-success="reloadTable" />
   <prestige-chroma-export-modal ref="exportModalRef" />
+  <prestige-chroma-image-download-modal ref="imageDownloadModalRef" />
   <prestige-chroma-r2-sync-modal ref="r2SyncModalRef" />
 
   <a-image
@@ -161,6 +170,7 @@ import { message } from 'ant-design-vue'
 import PrestigeChromaPageSearch from './PrestigeChromaPageSearch.vue'
 import PrestigeChromaFormModal from './PrestigeChromaFormModal.vue'
 import PrestigeChromaExportModal from './PrestigeChromaExportModal.vue'
+import PrestigeChromaImageDownloadModal from './PrestigeChromaImageDownloadModal.vue'
 import PrestigeChromaHubActions from './PrestigeChromaHubActions.vue'
 import PrestigeChromaR2SyncModal from './PrestigeChromaR2SyncModal.vue'
 import { DownloadOutlined } from '@ant-design/icons-vue'
@@ -184,6 +194,7 @@ const { hasPermission } = useAuthorize()
 const tableRef = ref<ProTableInstanceExpose>()
 const formModalRef = ref<InstanceType<typeof PrestigeChromaFormModal>>()
 const exportModalRef = ref<InstanceType<typeof PrestigeChromaExportModal>>()
+const imageDownloadModalRef = ref<InstanceType<typeof PrestigeChromaImageDownloadModal>>()
 const r2SyncModalRef = ref<InstanceType<typeof PrestigeChromaR2SyncModal>>()
 const syncLoading = ref(false)
 const batchModalVisible = ref(false)
@@ -245,6 +256,15 @@ const handleOpenExportModal = () => {
     query: { ...searchParams },
     total: currentTotal.value,
     gameVersion: resolveExportGameVersion(ids)
+  })
+}
+
+const handleOpenImageDownloadModal = () => {
+  const ids = selectedRowKeys.value.map(Number).filter(id => Number.isFinite(id))
+  imageDownloadModalRef.value?.open({
+    selectedIds: ids,
+    query: { ...searchParams },
+    total: currentTotal.value
   })
 }
 
