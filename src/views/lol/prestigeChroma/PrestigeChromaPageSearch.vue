@@ -65,6 +65,7 @@
 <script setup lang="ts">
 import { Form } from 'ant-design-vue'
 import type { PrestigeChromaQO } from '@/api/lol/prestigeChroma/types'
+import { snapshotPrestigeChromaQuery } from './prestigeChromaDownloadState'
 
 const useForm = Form.useForm
 const labelCol = { md: { span: 7 } }
@@ -96,7 +97,7 @@ const formModel = reactive<PrestigeChromaQO>(getDefaultFormModel())
 const { resetFields } = useForm(formModel)
 
 const search = () => {
-  emits('search', toRaw(formModel))
+  emits('search', snapshotPrestigeChromaQuery(toRaw(formModel)))
 }
 
 const reset = () => {

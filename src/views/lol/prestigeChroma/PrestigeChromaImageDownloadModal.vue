@@ -9,7 +9,20 @@
     @ok="handleSubmit"
     @cancel="handleClose"
   >
-    <a-alert :message="scopeMessage" type="info" show-icon style="margin-bottom: 20px" />
+    <a-alert :message="scopeMessage" type="info" show-icon style="margin-bottom: 20px">
+      <template #action>
+        <a-button
+          v-if="selectedIds.length === 0"
+          type="link"
+          size="small"
+          :loading="countRefreshing"
+          @click="refreshFilteredTotal"
+        >
+          <template #icon><ReloadOutlined /></template>
+          刷新数量
+        </a-button>
+      </template>
+    </a-alert>
 
     <a-form :model="formModel" :label-col="{ span: 7 }" :wrapper-col="{ span: 15 }">
       <a-form-item label="图片资源" required>
@@ -36,7 +49,8 @@
 
 <script setup lang="ts">
 import { message } from 'ant-design-vue'
-import { downloadPrestigeChromaImages } from '@/api/lol/prestigeChroma'
+import { ReloadOutlined } from '@ant-design/icons-vue'
+import { downloadPrestigeChromaImages, pagePrestigeChroma } from '@/api/lol/prestigeChroma'
 import type {
   PrestigeChromaImageAssetType,
   PrestigeChromaImageDownloadDTO,
@@ -45,6 +59,10 @@ import type {
 } from '@/api/lol/prestigeChroma/types'
 import { remoteFileDownload } from '@/utils/file-utils'
 import type { AxiosResponse } from 'axios'
+import {
+  buildPrestigeChromaCountPageParam,
+  snapshotPrestigeChromaQuery
+} from './prestigeChromaDownloadState'
 
 interface OpenOptions {
   selectedIds: number[]
@@ -54,6 +72,7 @@ interface OpenOptions {
 
 const visible = ref(false)
 const submitting = ref(false)
+const countRefreshing = ref(false)
 const selectedIds = ref<number[]>([])
 const currentQuery = ref<PrestigeChromaQO>({})
 const filteredTotal = ref(0)
@@ -73,11 +92,21 @@ const scopeMessage = computed(() =>
 
 const open = (options: OpenOptions) => {
   selectedIds.value = [...new Set(options.selectedIds)]
-  currentQuery.value = { ...options.query }
+  currentQuery.value = snapshotPrestigeChromaQuery(options.query)
   filteredTotal.value = options.total
   formModel.assetTypes = ['LARGE']
   formModel.language = 'ZH_CN'
   visible.value = true
+}
+
+const refreshFilteredTotal = async () => {
+  countRefreshing.value = true
+  try {
+    const result = await pagePrestigeChroma(buildPrestigeChromaCountPageParam(currentQuery.value))
+    filteredTotal.value = result.data.total
+  } finally {
+    countRefreshing.value = false
+  }
 }
 
 const handleClose = () => {

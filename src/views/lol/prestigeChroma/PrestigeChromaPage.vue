@@ -173,6 +173,7 @@ import PrestigeChromaExportModal from './PrestigeChromaExportModal.vue'
 import PrestigeChromaImageDownloadModal from './PrestigeChromaImageDownloadModal.vue'
 import PrestigeChromaHubActions from './PrestigeChromaHubActions.vue'
 import PrestigeChromaR2SyncModal from './PrestigeChromaR2SyncModal.vue'
+import { snapshotPrestigeChromaQuery } from './prestigeChromaDownloadState'
 import { DownloadOutlined } from '@ant-design/icons-vue'
 import { NewButton, DeleteTextButton } from '@/components/Button'
 import { OperationGroup } from '@/components/Operation'
@@ -231,7 +232,7 @@ const tableRequest: TableRequest = async (params, sorter, filter) => {
 }
 
 const searchTable = (params: PrestigeChromaQO) => {
-  searchParams = params
+  searchParams = snapshotPrestigeChromaQuery(params)
   reloadTable(true)
 }
 
