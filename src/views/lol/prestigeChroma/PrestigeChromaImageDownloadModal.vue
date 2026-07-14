@@ -134,12 +134,14 @@ const handleSubmit = async () => {
   }
 
   submitting.value = true
+  const hideLoading = message.loading('正在生成图片压缩包，请勿关闭页面', 0)
   try {
     const response = await downloadPrestigeChromaImages(dto)
     remoteFileDownload(response, resolveFilename(response))
     message.success('图片下载成功')
     visible.value = false
   } finally {
+    hideLoading()
     submitting.value = false
   }
 }

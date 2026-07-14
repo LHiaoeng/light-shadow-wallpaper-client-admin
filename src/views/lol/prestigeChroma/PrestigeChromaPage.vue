@@ -1,5 +1,5 @@
 <template>
-  <prestige-chroma-page-search :loading="tableRef?.loading" @search="searchTable" />
+  <prestige-chroma-page-search ref="searchRef" :loading="tableRef?.loading" @search="searchTable" />
 
   <pro-table
     ref="tableRef"
@@ -193,6 +193,7 @@ defineOptions({ name: 'PrestigeChromaPage' })
 
 const { hasPermission } = useAuthorize()
 const tableRef = ref<ProTableInstanceExpose>()
+const searchRef = ref<InstanceType<typeof PrestigeChromaPageSearch>>()
 const formModalRef = ref<InstanceType<typeof PrestigeChromaFormModal>>()
 const exportModalRef = ref<InstanceType<typeof PrestigeChromaExportModal>>()
 const imageDownloadModalRef = ref<InstanceType<typeof PrestigeChromaImageDownloadModal>>()
@@ -264,7 +265,7 @@ const handleOpenImageDownloadModal = () => {
   const ids = selectedRowKeys.value.map(Number).filter(id => Number.isFinite(id))
   imageDownloadModalRef.value?.open({
     selectedIds: ids,
-    query: { ...searchParams },
+    query: searchRef.value?.getQuery() ?? snapshotPrestigeChromaQuery(searchParams),
     total: currentTotal.value
   })
 }

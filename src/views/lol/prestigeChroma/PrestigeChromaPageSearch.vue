@@ -105,4 +105,8 @@ const reset = () => {
   Object.assign(formModel, getDefaultFormModel())
   search()
 }
+
+const getQuery = () => snapshotPrestigeChromaQuery(toRaw(formModel))
+
+defineExpose({ getQuery })
 </script>
