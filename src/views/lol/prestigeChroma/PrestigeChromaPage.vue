@@ -36,7 +36,7 @@
         </a-button>
         <prestige-chroma-hub-actions v-if="hasPermission('lol:prestige:hub-download')" />
         <a-button v-if="hasPermission('lol:prestige:r2-sync')" @click="handleOpenR2SyncModal">
-          同步图片到 R2
+          同步资源到 R2
         </a-button>
         <new-button v-if="hasPermission('lol:prestige-chroma:add')" @click="handleNew" />
         <a-popconfirm

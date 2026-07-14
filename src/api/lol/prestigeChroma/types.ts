@@ -80,8 +80,11 @@ export interface PrestigeChromaPageVO extends PrestigeChromaDTO {
 
 export interface PrestigeChromaR2SyncRequest {
   instanceIds?: string[]
+  assetGroups: PrestigeChromaR2AssetGroup[]
   force: boolean
 }
+
+export type PrestigeChromaR2AssetGroup = 'CHROMA_IMAGES' | 'CATEGORY_ICONS'
 
 export type PrestigeChromaR2TaskStatus =
   | 'PENDING'

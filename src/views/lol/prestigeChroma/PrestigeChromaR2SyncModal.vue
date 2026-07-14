@@ -1,10 +1,10 @@
 <template>
   <a-modal
-    title="同步臻彩图片到 Cloudflare R2"
+    title="同步臻彩图片与分类图标到 Cloudflare R2"
     :visible="visible"
     :mask-closable="false"
     :confirm-loading="submitting"
-    :ok-button-props="{ disabled: Boolean(task) }"
+    :ok-button-props="{ disabled: Boolean(task) || assetGroups.length === 0 }"
     ok-text="开始同步"
     cancel-text="关闭"
     width="820px"
@@ -12,6 +12,9 @@
     @cancel="close"
   >
     <a-alert :message="scopeMessage" type="info" show-icon style="margin-bottom: 16px" />
+    <a-form-item v-if="!task" label="同步内容">
+      <a-checkbox-group v-model:value="assetGroups" :options="assetGroupOptions" />
+    </a-form-item>
     <a-checkbox v-if="!task" v-model:checked="force">
       强制覆盖已存在对象，并精确清理对应公开 URL 缓存
     </a-checkbox>
@@ -66,6 +69,7 @@ import {
   getPrestigeChromaR2SyncTask
 } from '@/api/lol/prestigeChroma'
 import type {
+  PrestigeChromaR2AssetGroup,
   PrestigeChromaR2Task,
   PrestigeChromaR2TaskStatus
 } from '@/api/lol/prestigeChroma/types'
@@ -77,10 +81,16 @@ interface OpenOptions {
 const visible = ref(false)
 const submitting = ref(false)
 const force = ref(false)
+const assetGroups = ref<PrestigeChromaR2AssetGroup[]>(['CHROMA_IMAGES', 'CATEGORY_ICONS'])
 const instanceIds = ref<string[]>()
 const task = ref<PrestigeChromaR2Task>()
 let pollTimer: ReturnType<typeof setTimeout> | undefined
 let activeTaskId = ''
+
+const assetGroupOptions = [
+  { label: '臻彩皮肤图片', value: 'CHROMA_IMAGES' },
+  { label: '分类图标', value: 'CATEGORY_ICONS' }
+]
 
 const terminalStatuses: PrestigeChromaR2TaskStatus[] = [
   'SUCCEEDED',
@@ -90,6 +100,11 @@ const terminalStatuses: PrestigeChromaR2TaskStatus[] = [
 const terminal = computed(() => Boolean(task.value && terminalStatuses.includes(task.value.status)))
 const scopeMessage = computed(() =>
   instanceIds.value?.length ? `勾选 ${instanceIds.value.length} 条，仅同步选中项` : '同步全部数据'
+)
+const assetGroupMessage = computed(() =>
+  assetGroups.value
+    .map(group => (group === 'CHROMA_IMAGES' ? '臻彩皮肤图片' : '分类图标'))
+    .join('、')
 )
 const progressPercent = computed(() => {
   if (!task.value?.assetTotal) return terminal.value ? 100 : 0
@@ -107,15 +122,20 @@ const open = (options: OpenOptions) => {
   stopPolling()
   instanceIds.value = options.instanceIds?.length ? [...new Set(options.instanceIds)] : undefined
   force.value = false
+  assetGroups.value = ['CHROMA_IMAGES', 'CATEGORY_ICONS']
   task.value = undefined
   activeTaskId = ''
   visible.value = true
 }
 
 const submit = () => {
+  if (!assetGroups.value.length) {
+    message.warning('请至少选择一种同步内容')
+    return
+  }
   Modal.confirm({
-    title: force.value ? '确认强制覆盖 R2 图片？' : '确认开始同步 R2 图片？',
-    content: scopeMessage.value,
+    title: force.value ? '确认强制覆盖 R2 资源？' : '确认开始同步 R2 资源？',
+    content: `${scopeMessage.value}；同步内容：${assetGroupMessage.value}`,
     okText: '确认',
     cancelText: '取消',
     onOk: createTask
@@ -127,6 +147,7 @@ const createTask = async () => {
   try {
     const result = await createPrestigeChromaR2SyncTask({
       instanceIds: instanceIds.value,
+      assetGroups: assetGroups.value,
       force: force.value
     })
     if (result.code !== 200) {
