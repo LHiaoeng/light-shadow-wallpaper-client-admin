@@ -6,7 +6,10 @@ import type {
   PrestigeChromaDTO,
   PrestigeChromaExportDTO,
   PrestigeChromaPageParam,
-  PrestigeChromaPageVO
+  PrestigeChromaPageVO,
+  PrestigeChromaR2SyncRequest,
+  PrestigeChromaR2Task,
+  PrestigeChromaR2TaskCreated
 } from './types'
 
 export function pagePrestigeChroma(pageParams: PrestigeChromaPageParam) {
@@ -40,5 +43,32 @@ export function exportPrestigeChromaDocument(dto: PrestigeChromaExportDTO) {
     '/lol/prestige-chroma/export-doc',
     dto,
     { responseType: 'blob', timeout: 0 }
+  )
+}
+
+export function downloadPrestigeChromaHubJson() {
+  return httpClient.get<Blob>('/lol/prestige-chroma/hub-json/download', {
+    responseType: 'blob',
+    timeout: 0
+  })
+}
+
+export function writePrestigeChromaHubJson(directory: string) {
+  return httpClient.post<ApiResult<void>, { directory: string }>(
+    '/lol/prestige-chroma/hub-json/write',
+    { directory }
+  )
+}
+
+export function createPrestigeChromaR2SyncTask(dto: PrestigeChromaR2SyncRequest) {
+  return httpClient.post<ApiResult<PrestigeChromaR2TaskCreated>, PrestigeChromaR2SyncRequest>(
+    '/lol/prestige-chroma/r2-sync',
+    dto
+  )
+}
+
+export function getPrestigeChromaR2SyncTask(taskId: string) {
+  return httpClient.get<ApiResult<PrestigeChromaR2Task>>(
+    `/lol/prestige-chroma/r2-sync/${encodeURIComponent(taskId)}`
   )
 }

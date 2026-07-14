@@ -77,3 +77,58 @@ export interface PrestigeChromaPageVO extends PrestigeChromaDTO {
   createTime?: string
   updateTime?: string
 }
+
+export interface PrestigeChromaR2SyncRequest {
+  instanceIds?: string[]
+  force: boolean
+}
+
+export type PrestigeChromaR2TaskStatus =
+  | 'PENDING'
+  | 'RUNNING'
+  | 'SUCCEEDED'
+  | 'COMPLETED_WITH_ERRORS'
+  | 'FAILED'
+
+export type PrestigeChromaR2TaskScope = 'ALL' | 'SELECTED'
+export type PrestigeChromaR2AssetType = 'SITE3' | 'SITE4' | 'SITE5' | 'TAG'
+export type PrestigeChromaR2FailureStage =
+  | 'MANIFEST'
+  | 'HEAD'
+  | 'DOWNLOAD'
+  | 'VALIDATE'
+  | 'UPLOAD'
+  | 'CACHE_PURGE'
+
+export interface PrestigeChromaR2AssetFailure {
+  instanceId: string
+  assetType: PrestigeChromaR2AssetType
+  objectKey: string
+  stage: PrestigeChromaR2FailureStage
+  message: string
+}
+
+export interface PrestigeChromaR2TaskCreated {
+  taskId: string
+  status: 'PENDING'
+  createdAt: string
+}
+
+export interface PrestigeChromaR2Task {
+  taskId: string
+  status: PrestigeChromaR2TaskStatus
+  force: boolean
+  scope: PrestigeChromaR2TaskScope
+  chromaTotal: number
+  assetTotal: number
+  processed: number
+  uploaded: number
+  skipped: number
+  failed: number
+  createdAt: string
+  startedAt?: string
+  finishedAt?: string
+  failureDetails: PrestigeChromaR2AssetFailure[]
+  failureDetailsTruncated: boolean
+  message?: string
+}

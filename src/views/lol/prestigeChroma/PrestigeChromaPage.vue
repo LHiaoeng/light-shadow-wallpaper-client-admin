@@ -34,6 +34,10 @@
           <template #icon><DownloadOutlined /></template>
           导出文档
         </a-button>
+        <prestige-chroma-hub-actions v-if="hasPermission('lol:prestige:hub-download')" />
+        <a-button v-if="hasPermission('lol:prestige:r2-sync')" @click="handleOpenR2SyncModal">
+          同步图片到 R2
+        </a-button>
         <new-button v-if="hasPermission('lol:prestige-chroma:add')" @click="handleNew" />
         <a-popconfirm
           v-if="hasPermission('lol:prestige-chroma:sync')"
@@ -112,6 +116,7 @@
 
   <prestige-chroma-form-modal ref="formModalRef" @submit-success="reloadTable" />
   <prestige-chroma-export-modal ref="exportModalRef" />
+  <prestige-chroma-r2-sync-modal ref="r2SyncModalRef" />
 
   <a-image
     v-if="chromaPreviewUrl"
@@ -156,6 +161,8 @@ import { message } from 'ant-design-vue'
 import PrestigeChromaPageSearch from './PrestigeChromaPageSearch.vue'
 import PrestigeChromaFormModal from './PrestigeChromaFormModal.vue'
 import PrestigeChromaExportModal from './PrestigeChromaExportModal.vue'
+import PrestigeChromaHubActions from './PrestigeChromaHubActions.vue'
+import PrestigeChromaR2SyncModal from './PrestigeChromaR2SyncModal.vue'
 import { DownloadOutlined } from '@ant-design/icons-vue'
 import { NewButton, DeleteTextButton } from '@/components/Button'
 import { OperationGroup } from '@/components/Operation'
@@ -177,6 +184,7 @@ const { hasPermission } = useAuthorize()
 const tableRef = ref<ProTableInstanceExpose>()
 const formModalRef = ref<InstanceType<typeof PrestigeChromaFormModal>>()
 const exportModalRef = ref<InstanceType<typeof PrestigeChromaExportModal>>()
+const r2SyncModalRef = ref<InstanceType<typeof PrestigeChromaR2SyncModal>>()
 const syncLoading = ref(false)
 const batchModalVisible = ref(false)
 const batchSubmitLoading = ref(false)
@@ -238,6 +246,13 @@ const handleOpenExportModal = () => {
     total: currentTotal.value,
     gameVersion: resolveExportGameVersion(ids)
   })
+}
+
+const handleOpenR2SyncModal = () => {
+  const ids = selectedRows.value
+    .map(row => row.instanceId?.trim())
+    .filter((instanceId): instanceId is string => Boolean(instanceId))
+  r2SyncModalRef.value?.open({ instanceIds: ids.length > 0 ? ids : undefined })
 }
 
 const resolveExportGameVersion = (ids: number[]) => {
