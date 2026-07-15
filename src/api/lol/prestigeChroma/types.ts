@@ -56,7 +56,13 @@ export interface PrestigeChromaExportDTO {
   slideDurationSeconds?: number
 }
 
-export type PrestigeChromaImageAssetType = 'LARGE' | 'MEDIUM' | 'SMALL' | 'CATEGORY_ICON'
+export type PrestigeChromaImageAssetType =
+  | 'LARGE'
+  | 'MEDIUM'
+  | 'SMALL'
+  | 'CATEGORY_ICON'
+  | 'WALLPAPER'
+  | 'DYNAMIC_WALLPAPER'
 export type PrestigeChromaImageFilenameLanguage = 'ZH_CN' | 'EN_US'
 
 export interface PrestigeChromaImageDownloadDTO {

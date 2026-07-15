@@ -30,6 +30,8 @@
             <a-checkbox value="MEDIUM">中图</a-checkbox>
             <a-checkbox value="SMALL">小图</a-checkbox>
             <a-checkbox value="CATEGORY_ICON">臻彩分类图标</a-checkbox>
+            <a-checkbox value="WALLPAPER">壁纸</a-checkbox>
+            <a-checkbox value="DYNAMIC_WALLPAPER">动态壁纸</a-checkbox>
           </a-space>
         </a-checkbox-group>
       </a-form-item>
