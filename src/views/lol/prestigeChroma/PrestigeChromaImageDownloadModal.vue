@@ -24,16 +24,25 @@
 
     <a-form :model="formModel" :label-col="{ span: 7 }" :wrapper-col="{ span: 15 }">
       <a-form-item label="图片资源" required>
-        <a-checkbox-group v-model:value="formModel.assetTypes">
-          <a-space direction="vertical">
-            <a-checkbox value="LARGE">大图</a-checkbox>
-            <a-checkbox value="MEDIUM">中图</a-checkbox>
-            <a-checkbox value="SMALL">小图</a-checkbox>
-            <a-checkbox value="CATEGORY_ICON">臻彩分类图标</a-checkbox>
-            <a-checkbox value="WALLPAPER">壁纸</a-checkbox>
-            <a-checkbox value="DYNAMIC_WALLPAPER">动态壁纸</a-checkbox>
-          </a-space>
-        </a-checkbox-group>
+        <a-space direction="vertical">
+          <a-checkbox
+            :checked="allAssetTypesSelected"
+            :indeterminate="someAssetTypesSelected"
+            @change="handleSelectAllChange"
+          >
+            全选
+          </a-checkbox>
+          <a-checkbox-group v-model:value="formModel.assetTypes">
+            <a-space direction="vertical">
+              <a-checkbox value="LARGE">大图</a-checkbox>
+              <a-checkbox value="MEDIUM">中图</a-checkbox>
+              <a-checkbox value="SMALL">小图</a-checkbox>
+              <a-checkbox value="CATEGORY_ICON">臻彩分类图标</a-checkbox>
+              <a-checkbox value="WALLPAPER">壁纸</a-checkbox>
+              <a-checkbox value="DYNAMIC_WALLPAPER">动态壁纸</a-checkbox>
+            </a-space>
+          </a-checkbox-group>
+        </a-space>
       </a-form-item>
 
       <a-form-item label="文件名语言" required>
@@ -70,6 +79,28 @@ interface OpenOptions {
   total: number
 }
 
+interface CheckboxChangeEvent {
+  target: {
+    checked: boolean
+  }
+}
+
+const allAssetTypes: PrestigeChromaImageAssetType[] = [
+  'LARGE',
+  'MEDIUM',
+  'SMALL',
+  'CATEGORY_ICON',
+  'WALLPAPER',
+  'DYNAMIC_WALLPAPER'
+]
+
+const defaultAssetTypes: PrestigeChromaImageAssetType[] = [
+  'LARGE',
+  'CATEGORY_ICON',
+  'WALLPAPER',
+  'DYNAMIC_WALLPAPER'
+]
+
 const visible = ref(false)
 const submitting = ref(false)
 const countRefreshing = ref(false)
@@ -80,9 +111,20 @@ const formModel = reactive<{
   assetTypes: PrestigeChromaImageAssetType[]
   language: PrestigeChromaImageFilenameLanguage
 }>({
-  assetTypes: ['LARGE'],
+  assetTypes: [...defaultAssetTypes],
   language: 'ZH_CN'
 })
+
+const allAssetTypesSelected = computed(() =>
+  allAssetTypes.every(assetType => formModel.assetTypes.includes(assetType))
+)
+const someAssetTypesSelected = computed(
+  () => formModel.assetTypes.length > 0 && !allAssetTypesSelected.value
+)
+
+const handleSelectAllChange = (event: CheckboxChangeEvent) => {
+  formModel.assetTypes = event.target.checked ? [...allAssetTypes] : []
+}
 
 const scopeMessage = computed(() =>
   selectedIds.value.length > 0
@@ -94,7 +136,7 @@ const open = (options: OpenOptions) => {
   selectedIds.value = [...new Set(options.selectedIds)]
   currentQuery.value = snapshotPrestigeChromaQuery(options.query)
   filteredTotal.value = options.total
-  formModel.assetTypes = ['LARGE']
+  formModel.assetTypes = [...defaultAssetTypes]
   formModel.language = 'ZH_CN'
   visible.value = true
 }
