@@ -85,7 +85,9 @@ export function fileDownload(blob: Blob, filename: string) {
     a.style.display = 'none'
     a.href = href // 指定下载链接
     a.download = filename //指定下载文件名
+    document.body.appendChild(a)
     a.click() //触发下载
-    URL.revokeObjectURL(a.href) //释放URL对象
+    document.body.removeChild(a)
+    window.setTimeout(() => URL.revokeObjectURL(href), 1000) //释放URL对象
   }
 }
