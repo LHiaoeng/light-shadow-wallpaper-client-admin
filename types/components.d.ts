@@ -80,6 +80,7 @@ declare module '@vue/runtime-core' {
     CaretDownOutlined: typeof import('@ant-design/icons-vue')['CaretDownOutlined']
     CaretRightOutlined: typeof import('@ant-design/icons-vue')['CaretRightOutlined']
     CheckOutlined: typeof import('@ant-design/icons-vue')['CheckOutlined']
+    ChromaColorCircle: typeof import('./../src/components/ChromaColorCircle/index.vue')['default']
     ConcatCaptcha: typeof import('./../src/components/Captcha/ConcatCaptcha.vue')['default']
     ConfirmTextButton: typeof import('./../src/components/Button/ConfirmTextButton.vue')['default']
     CopyOutlined: typeof import('@ant-design/icons-vue')['CopyOutlined']
