@@ -408,12 +408,7 @@
                 <div class="chroma-meta">
                   <div class="chroma-name">{{ chroma.name || chroma.id || '-' }}</div>
                   <div v-if="chroma.colors.length" class="chroma-colors">
-                    <span
-                      v-for="color in chroma.colors"
-                      :key="color"
-                      class="chroma-color"
-                      :style="{ backgroundColor: color }"
-                    />
+                    <chroma-color-circle :colors="chroma.colors" />
                   </div>
                 </div>
               </div>
@@ -447,6 +442,7 @@ import { createLolSkin, updateLolSkin } from '@/api/lol/skin'
 import type { LolSkinDTO, LolSkinPageVO } from '@/api/lol/skin/types'
 import { pageSkinline } from '@/api/lol/skinline'
 import type { SkinlinePageVO } from '@/api/lol/skinline/types'
+import ChromaColorCircle from '@/components/ChromaColorCircle/index.vue'
 import { toBreadjAssetUrl } from '@/utils/community-dragon-utils'
 import { useLolSkinDictPresentation } from './lol-skin-dict-presentation'
 
@@ -728,7 +724,9 @@ defineExpose({
 }
 
 .chroma-meta {
+  width: 96px;
   margin-top: 6px;
+  text-align: center;
 }
 
 .chroma-name {
@@ -742,14 +740,8 @@ defineExpose({
 .chroma-colors {
   display: flex;
   gap: 4px;
+  justify-content: center;
   margin-top: 4px;
-}
-
-.chroma-color {
-  width: 14px;
-  height: 14px;
-  border: 1px solid #d9d9d9;
-  border-radius: 50%;
 }
 
 .dict-option {
