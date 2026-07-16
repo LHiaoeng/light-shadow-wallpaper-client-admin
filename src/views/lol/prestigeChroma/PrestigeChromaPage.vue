@@ -7,7 +7,7 @@
     row-key="id"
     :request="tableRequest"
     :columns="columns"
-    :scroll="{ x: 2300 }"
+    :scroll="{ x: 2900 }"
     :row-selection="{ selectedRowKeys, onChange: handleSelectionChange }"
   >
     <template #tableAlertOptionRender="{ intl, onCleanSelected, selectedRowKeys: selectedKeys }">
@@ -80,6 +80,9 @@
         <a-typography-text copyable class="name-text">
           {{ record.itemNameEng || '-' }}
         </a-typography-text>
+      </template>
+      <template v-if="column.key === 'colors'">
+        <chroma-color-circle :colors="record.colors" />
       </template>
       <template v-if="column.key === 'sourceSkinName'">
         <a-typography-text copyable>{{ record.sourceSkinName || '-' }}</a-typography-text>
@@ -172,6 +175,7 @@ import PrestigeChromaFormModal from './PrestigeChromaFormModal.vue'
 import PrestigeChromaExportModal from './PrestigeChromaExportModal.vue'
 import PrestigeChromaImageDownloadModal from './PrestigeChromaImageDownloadModal.vue'
 import PrestigeChromaHubActions from './PrestigeChromaHubActions.vue'
+import ChromaColorCircle from '@/components/ChromaColorCircle/index.vue'
 import PrestigeChromaR2SyncModal from './PrestigeChromaR2SyncModal.vue'
 import { snapshotPrestigeChromaQuery } from './prestigeChromaDownloadState'
 import { DownloadOutlined } from '@ant-design/icons-vue'
@@ -403,6 +407,13 @@ const columns: ProColumns[] = [
     width: 96
   },
   {
+    key: 'colors',
+    title: '炫彩颜色',
+    dataIndex: 'colors',
+    width: 100,
+    align: 'center'
+  },
+  {
     key: 'categoryName',
     title: '分类',
     dataIndex: 'categoryName',
@@ -432,6 +443,18 @@ const columns: ProColumns[] = [
     title: '臻彩名称英文',
     dataIndex: 'itemNameEng',
     width: 260,
+    ellipsis: true
+  },
+  {
+    title: '中文描述',
+    dataIndex: 'description',
+    width: 300,
+    ellipsis: true
+  },
+  {
+    title: '英文描述',
+    dataIndex: 'descriptionEng',
+    width: 320,
     ellipsis: true
   },
   {

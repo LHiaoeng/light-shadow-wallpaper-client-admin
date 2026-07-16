@@ -41,6 +41,21 @@
             <a-input v-model:value="formModel.itemNameEng" />
           </a-form-item>
         </a-col>
+        <a-col :span="24">
+          <a-form-item label="中文描述" :label-col="{ span: 4 }" :wrapper-col="{ span: 19 }">
+            <a-textarea v-model:value="formModel.description" :auto-size="{ minRows: 2, maxRows: 6 }" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item label="英文描述" :label-col="{ span: 4 }" :wrapper-col="{ span: 19 }">
+            <a-textarea v-model:value="formModel.descriptionEng" :auto-size="{ minRows: 2, maxRows: 6 }" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item label="炫彩颜色" :label-col="{ span: 4 }" :wrapper-col="{ span: 19 }">
+            <a-input v-model:value="formModel.colors" placeholder='JSON 数组，如 ["#FFEE59","#123456"]' />
+          </a-form-item>
+        </a-col>
         <a-col :xl="8" :md="12" :sm="24">
           <a-form-item label="英雄ID">
             <a-input-number v-model:value="formModel.heroId" style="width: 100%" />
@@ -160,6 +175,9 @@ const getDefaultFormModel = (): PrestigeChromaDTO => ({
   instanceId: undefined,
   itemName: undefined,
   itemNameEng: undefined,
+  description: undefined,
+  descriptionEng: undefined,
+  colors: undefined,
   sourceSkinId: undefined,
   sourceSkinInstanceId: undefined,
   sourceSkinName: undefined,

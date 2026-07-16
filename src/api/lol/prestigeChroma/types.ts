@@ -10,6 +10,9 @@ export interface PrestigeChromaDTO {
   instanceId?: string
   itemName?: string
   itemNameEng?: string
+  description?: string
+  descriptionEng?: string
+  colors?: string
   sourceSkinId?: number
   sourceSkinInstanceId?: string
   sourceSkinName?: string
