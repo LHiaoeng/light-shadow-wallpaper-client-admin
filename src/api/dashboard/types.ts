@@ -1,5 +1,5 @@
 /**
- * 仪表盘统计数据
+ * 工作台统计数据
  */
 export interface DashboardStatisticsVO {
   // 壁纸总数
