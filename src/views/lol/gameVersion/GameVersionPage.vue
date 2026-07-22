@@ -1,6 +1,37 @@
 <template>
   <game-version-page-search :loading="tableRef?.loading" @search="searchTable" />
 
+  <a-card :bordered="false" class="cd-version-card" title="CommunityDragon 版本状态">
+    <template #extra>
+      <a-button size="small" :loading="cdVersionLoading" @click="loadCdVersionStatus">
+        刷新
+      </a-button>
+    </template>
+    <a-spin :spinning="cdVersionLoading">
+      <a-row :gutter="[16, 16]">
+        <a-col v-for="item in cdVersionItems" :key="item.version" :xs="24" :md="12">
+          <a-descriptions :column="1" bordered size="small">
+            <a-descriptions-item label="环境">
+              {{ item.version === 'latest' ? 'Latest 正式服' : 'PBE 测试服' }}
+            </a-descriptions-item>
+            <a-descriptions-item label="源站版本">
+              {{ item.sourceVersion || '-' }}
+            </a-descriptions-item>
+            <a-descriptions-item label="Redis 版本">
+              {{ item.redisVersion || '-' }}
+            </a-descriptions-item>
+            <a-descriptions-item label="同步状态">
+              <a-tag :color="item.consistent ? 'success' : 'error'">
+                {{ item.consistent ? '一致' : '不一致' }}
+              </a-tag>
+            </a-descriptions-item>
+          </a-descriptions>
+        </a-col>
+      </a-row>
+      <a-empty v-if="!cdVersionLoading && cdVersionItems.length === 0" description="暂无版本状态" />
+    </a-spin>
+  </a-card>
+
   <pro-table
     ref="tableRef"
     header-title="游戏版本管理"
@@ -57,8 +88,17 @@
 import type { ProColumns } from '#/table'
 import ProTable from '#/table'
 import type { ProTableInstanceExpose, TableRequest } from '#/table'
-import { deleteGameVersion, pageGameVersion, syncGameVersion } from '@/api/lol/gameVersion'
-import type { GameVersionPageVO, GameVersionQO } from '@/api/lol/gameVersion/types'
+import {
+  deleteGameVersion,
+  getCdContentVersionStatus,
+  pageGameVersion,
+  syncGameVersion
+} from '@/api/lol/gameVersion'
+import type {
+  CdContentVersionItem,
+  GameVersionPageVO,
+  GameVersionQO
+} from '@/api/lol/gameVersion/types'
 import { DeleteTextButton, NewButton } from '@/components/Button'
 import { OperationGroup } from '@/components/Operation'
 import { FormAction } from '@/hooks/form'
@@ -74,6 +114,8 @@ const { hasPermission } = useAuthorize()
 const tableRef = ref<ProTableInstanceExpose>()
 const formModalRef = ref<InstanceType<typeof GameVersionFormModal>>()
 const syncLoading = ref(false)
+const cdVersionLoading = ref(false)
+const cdVersionItems = ref<CdContentVersionItem[]>([])
 let searchParams: GameVersionQO = {}
 
 const reloadTable = (resetPageIndex?: boolean) => {
@@ -115,6 +157,20 @@ const handleSync = () => {
     }
   })
 }
+
+const loadCdVersionStatus = () => {
+  cdVersionLoading.value = true
+  doRequest(getCdContentVersionStatus(), {
+    onSuccess: res => {
+      cdVersionItems.value = res.data.items
+    },
+    onFinally: () => {
+      cdVersionLoading.value = false
+    }
+  })
+}
+
+onMounted(loadCdVersionStatus)
 
 const columns: ProColumns[] = [
   {
@@ -159,3 +215,9 @@ const columns: ProColumns[] = [
   }
 ]
 </script>
+
+<style scoped>
+.cd-version-card {
+  margin-bottom: 16px;
+}
+</style>

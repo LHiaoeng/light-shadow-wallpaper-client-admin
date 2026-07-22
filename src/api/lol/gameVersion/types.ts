@@ -18,3 +18,15 @@ export interface GameVersionPageVO extends GameVersionDTO {
   createTime?: string
   updateTime?: string
 }
+
+export interface CdContentVersionItem {
+  version: string
+  sourceVersion: string | null
+  redisVersion: string | null
+  consistent: boolean | null
+  redisKey: string
+}
+
+export interface CommunityDragonContentVersionVO {
+  items: CdContentVersionItem[]
+}

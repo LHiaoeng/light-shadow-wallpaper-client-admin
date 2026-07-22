@@ -1,6 +1,11 @@
 import type { ApiResult, PageResult } from '@/api/types'
 import httpClient from '@/utils/axios'
-import type { GameVersionDTO, GameVersionPageParam, GameVersionPageVO } from './types'
+import type {
+  CommunityDragonContentVersionVO,
+  GameVersionDTO,
+  GameVersionPageParam,
+  GameVersionPageVO
+} from './types'
 
 export function pageGameVersion(pageParams: GameVersionPageParam) {
   return httpClient.get<ApiResult<PageResult<GameVersionPageVO>>>('/lol/game-ver/page', {
@@ -22,4 +27,10 @@ export function deleteGameVersion(id: number) {
 
 export function syncGameVersion() {
   return httpClient.post<ApiResult<void>>('/lol/game-ver/sync')
+}
+
+export function getCdContentVersionStatus() {
+  return httpClient.get<ApiResult<CommunityDragonContentVersionVO>>(
+    '/lol/game-ver/cd-content-version'
+  )
 }
