@@ -20,24 +20,11 @@ const HOME_ROUTE: RouteRecordRaw = {
   children: []
 }
 
-// 工作台常量路由，登录后默认落地页，不依赖后端菜单配置
-const DASHBOARD_ROUTE: RouteRecordRaw = {
-  path: '/dashboard',
-  name: 'Dashboard',
-  component: () => import('@/views/dashboard/index.vue'),
-  meta: {
-    name: '工作台',
-    icon: 'DashboardOutlined'
-  }
-}
-
 export const generatorDynamicRouter = (userMenus: SysMenuRouterVO[]): RouteRecordRaw => {
   const routes: RouteRecordRaw = { ...HOME_ROUTE }
   // 后端数据, 根级树数组,  根级 PID
   const menuTree = listToTree(userMenus, 0) as SysMenuRouterTree[]
   routes.children = menuToRoutes(menuTree)
-  // 工作台作为第一个子路由，fillRedirect 会自动把根路由重定向到此页
-  routes.children.unshift(DASHBOARD_ROUTE)
   routes.children.push(buildNotFoundRoute('PageNotFound'))
   fillRedirect(routes)
 

@@ -1,20 +1,27 @@
 <template>
-  <a-card
-    v-for="group in visibleGroups"
-    :key="group.groupKey"
-    :title="t(group.groupKey)"
-    :bordered="false"
-    class="shortcut-group"
-  >
-    <a-row :gutter="[16, 16]">
-      <a-col v-for="item in group.items" :key="item.target" :xs="12" :sm="8" :md="6" :lg="4">
-        <a-card hoverable class="shortcut-card" @click="go(item.target)">
-          <component :is="item.icon" class="shortcut-icon" />
-          <span class="shortcut-title">{{ t(item.titleKey) }}</span>
-        </a-card>
-      </a-col>
-    </a-row>
-  </a-card>
+  <a-space direction="vertical" :size="16" style="width: 100%">
+    <a-card
+      v-for="group in visibleGroups"
+      :key="group.groupKey"
+      :title="t(group.groupKey)"
+      :bordered="false"
+    >
+      <a-row :gutter="[16, 16]">
+        <a-col v-for="item in group.items" :key="item.target" :xs="12" :sm="8" :md="6" :lg="4">
+          <a-card
+            hoverable
+            :body-style="{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '72px' }"
+            @click="go(item.target)"
+          >
+            <a-space :size="10" align="center">
+              <component :is="item.icon" :style="{ display: 'block' }" />
+              <span :style="{ fontSize: '14px', lineHeight: 1 }">{{ t(item.titleKey) }}</span>
+            </a-space>
+          </a-card>
+        </a-col>
+      </a-row>
+    </a-card>
+  </a-space>
 </template>
 
 <script setup lang="ts">
@@ -38,28 +45,3 @@ const visibleGroups = computed(() =>
 
 const go = (target: string) => router.push(target)
 </script>
-
-<style scoped>
-.shortcut-group {
-  margin-bottom: 16px;
-}
-
-.shortcut-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  cursor: pointer;
-}
-
-.shortcut-icon {
-  font-size: 28px;
-  color: var(--primary-color, #1890ff);
-  margin-bottom: 8px;
-}
-
-.shortcut-title {
-  font-size: 14px;
-}
-</style>

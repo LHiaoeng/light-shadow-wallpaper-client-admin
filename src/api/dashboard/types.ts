@@ -2,8 +2,10 @@
  * 工作台统计数据
  */
 export interface DashboardStatisticsVO {
-  // 壁纸总数
-  wallpaperTotal: number
+  // 图片壁纸总数
+  imageWallpaperTotal: number
+  // 视频壁纸总数
+  videoWallpaperTotal: number
   // 今日新增壁纸
   wallpaperToday: number
   // 注册用户数

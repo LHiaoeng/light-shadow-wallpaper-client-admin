@@ -17,14 +17,16 @@ import type { DashboardStatisticsVO } from '@/api/dashboard/types'
 const { t } = useI18n()
 const loading = ref(true)
 const statistics = ref<DashboardStatisticsVO>({
-  wallpaperTotal: 0,
+  imageWallpaperTotal: 0,
+  videoWallpaperTotal: 0,
   wallpaperToday: 0,
   userTotal: 0,
   visitToday: 0
 })
 
 const cards = [
-  { key: 'wallpaperTotal', titleKey: 'dashboard.stat.wallpaperTotal' },
+  { key: 'imageWallpaperTotal', titleKey: 'dashboard.stat.imageWallpaperTotal' },
+  { key: 'videoWallpaperTotal', titleKey: 'dashboard.stat.videoWallpaperTotal' },
   { key: 'wallpaperToday', titleKey: 'dashboard.stat.wallpaperToday' },
   { key: 'userTotal', titleKey: 'dashboard.stat.userTotal' },
   { key: 'visitToday', titleKey: 'dashboard.stat.visitToday' }
@@ -32,9 +34,9 @@ const cards = [
 
 onMounted(async () => {
   try {
-    const { data } = await getDashboardStatistics()
-    if (data?.code === 200 && data.data) {
-      statistics.value = data.data
+    const res = await getDashboardStatistics()
+    if (res.code === 200 && res.data) {
+      statistics.value = res.data
     }
   } finally {
     loading.value = false
