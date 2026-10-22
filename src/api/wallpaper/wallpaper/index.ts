@@ -1,6 +1,6 @@
 import httpClient from '@/utils/axios'
 import type { ApiResult } from '@/api/types'
-import type { WallpaperDTO, WallpaperPageParam, WallpaperPageVO } from './types'
+import type { WallpaperBatchUpdateDTO, WallpaperDTO, WallpaperPageParam, WallpaperPageVO } from './types'
 import type { OssFileInfo } from '@/api/oss/types'
 
 /**
@@ -53,4 +53,13 @@ export function backupWallpaper(id: number, force = false) {
 
 export function backupVideoWallpaper(id: number, force = false) {
   return backupWallpaper(id, force)
+}
+
+/**
+ * 批量修改壁纸字段，未填值的字段不参与更新
+ * @param dto 批量修改参数
+ * @returns data 为实际匹配到的壁纸数量
+ */
+export function batchUpdateWallpaper(dto: WallpaperBatchUpdateDTO) {
+  return httpClient.put<ApiResult<number>>('/wallpaper/wallpaper/batch-basic', dto)
 }

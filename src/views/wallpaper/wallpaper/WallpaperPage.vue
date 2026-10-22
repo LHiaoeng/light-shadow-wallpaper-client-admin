@@ -9,7 +9,23 @@
     :request="tableRequest"
     :columns="columns"
     :scroll="{ x: 1000 }"
+    :row-selection="{ selectedRowKeys, onChange: handleSelectionChange }"
   >
+    <!-- 多选操作区域 -->
+    <template #tableAlertOptionRender="{ intl, onCleanSelected, selectedRowKeys: selectedKeys }">
+      <a-space :size="16">
+        <a
+          v-if="hasPermission('wallpaper:wallpaper:edit')"
+          @click="handleOpenBatchModal(selectedKeys)"
+        >
+          批量修改
+        </a>
+        <a @click="handleCleanSelected(onCleanSelected)">
+          {{ intl.getMessage('alert.clear', '清空') }}
+        </a>
+      </a-space>
+    </template>
+
     <!-- 操作按钮区域 -->
     <template #toolBarRender>
       <new-button v-if="hasPermission('wallpaper:wallpaper:add')" @click="handleNew" />
@@ -48,6 +64,7 @@
 
   <!-- 系统配置新建修改的表单弹窗 -->
   <wallpaper-form-modal ref="formModalRef" @submit-success="reloadTable" />
+  <wallpaper-batch-update-modal ref="batchModalRef" @submit-success="handleBatchSuccess" />
   <WallpaperUrlAddModal ref="addUrlModalRef" @submit-success="reloadTable" />
 </template>
 
@@ -74,9 +91,14 @@ import { DictText } from '@/components/Dict'
 import dayjs from 'dayjs'
 import UrlCell from '@/components/UrlCell/index.vue'
 import WallpaperUrlAddModal from '@/views/wallpaper/wallpaper/WallpaperUrlAddModal.vue'
+import WallpaperBatchUpdateModal from '@/views/wallpaper/wallpaper/WallpaperBatchUpdateModal.vue'
+import { message } from 'ant-design-vue'
 import { ref } from 'vue'
 
 defineOptions({ name: 'WallpaperPage' })
+
+/** 单次批量修改的记录数上限，与后端校验保持一致 */
+const BATCH_UPDATE_MAX_SIZE = 500
 
 // 鉴权方法
 const { hasPermission } = useAuthorize()
@@ -85,6 +107,44 @@ const { hasPermission } = useAuthorize()
 const tableRef = ref<ProTableInstanceExpose>()
 const formModalRef = ref<InstanceType<typeof WallpaperFormModal>>()
 const addUrlModalRef = ref<InstanceType<typeof WallpaperUrlAddModal>>()
+const batchModalRef = ref<InstanceType<typeof WallpaperBatchUpdateModal>>()
+
+// 多选状态，跨页保留
+const selectedRowKeys = ref<Array<number | string>>([])
+
+/* 清空多选 */
+const clearSelectedRows = () => {
+  selectedRowKeys.value = []
+}
+
+const handleSelectionChange = (keys: Array<number | string>) => {
+  selectedRowKeys.value = keys
+}
+
+const handleCleanSelected = (onCleanSelected: () => void) => {
+  onCleanSelected()
+  clearSelectedRows()
+}
+
+/* 打开批量修改弹窗 */
+const handleOpenBatchModal = (keys: Array<number | string>) => {
+  const ids = keys.map(Number).filter(id => Number.isFinite(id))
+  if (ids.length === 0) {
+    message.warning('请选择需要修改的壁纸')
+    return
+  }
+  if (ids.length > BATCH_UPDATE_MAX_SIZE) {
+    message.warning(`单次批量修改不能超过 ${BATCH_UPDATE_MAX_SIZE} 条，请减少选中数量`)
+    return
+  }
+  batchModalRef.value?.open(ids)
+}
+
+/* 批量修改成功 */
+const handleBatchSuccess = () => {
+  clearSelectedRows()
+  reloadTable()
+}
 
 /* 刷新表格 */
 const reloadTable = (resetPageIndex?: boolean) => {
