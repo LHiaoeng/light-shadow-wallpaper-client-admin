@@ -23,6 +23,7 @@ const wallpaper = ref<WallpaperDTO>()
 const submitLoading = ref(false)
 const wallpaperUrlList = ref<WallpaperUrlDTO[]>([])
 const analyzeSpinning = ref<boolean>(false)
+const fileAnalyzerRef = ref<InstanceType<typeof FileAnalyzer>>()
 
 const handleSubmit = () => {
   closeModal()
@@ -58,7 +59,8 @@ const addWallpaperUrl = (wallpaperUrlDTO: WallpaperUrlDTO) => {
     .then(res => {
       if (res.code === 200) {
         wallpaperUrlList.value.push(res.data)
-        fileUrl.value = ''
+        // 清空子组件内的输入框，方便继续录入下一个源
+        fileAnalyzerRef.value?.reset()
       } else {
         message.error(res.message)
       }
@@ -105,7 +107,6 @@ function formatSize(bytes: number): string {
 const getResourceUrl = (url?: string) => resolveResourceUrl(url)
 
 const fileInfo = ref<WallpaperUrlDTO | null>(null)
-const fileUrl = ref<string>('')
 
 watch(fileInfo, newValue => {
   if (newValue) {
@@ -140,7 +141,7 @@ defineExpose({
     @cancel="handleClose"
   >
     <a-spin :spinning="analyzeSpinning" tip="分析中...">
-      <FileAnalyzer v-model:fileInfo="fileInfo" />
+      <FileAnalyzer ref="fileAnalyzerRef" v-model:fileInfo="fileInfo" />
     </a-spin>
     <a-divider />
     <div class="wallpaper-url-list">
