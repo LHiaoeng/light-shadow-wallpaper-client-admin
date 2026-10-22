@@ -61,10 +61,15 @@
 import { createLolmSkin, pageLolmHero, updateLolmSkin } from '@/api/lolmCatalog'
 import type { LolmHero, LolmSkin } from '@/api/lolmCatalog/types'
 import { FormAction, useFormAction } from '@/hooks/form'
+import {
+  LOLM_CATALOG_STATUS,
+  resetLolmCatalogForm,
+  useLolmCatalogFormSubmit
+} from '@/hooks/lolmCatalog'
 import { useModal } from '@/hooks/modal'
-import { doRequest } from '@/utils/axios/request'
 import type { ColProps } from 'ant-design-vue'
 
+const LOLM_HERO_SELECT_PAGE_SIZE = 500
 const labelCol: ColProps = { sm: { span: 24 }, md: { span: 5 } }
 const emits = defineEmits<{ (event: 'submit-success'): void }>()
 const { title, visible, openModal, closeModal } = useModal()
@@ -73,7 +78,20 @@ const formRef = ref()
 const submitLoading = ref(false)
 const heroLoading = ref(false)
 const heroes = ref<LolmHero[]>([])
-const formModel = reactive<LolmSkin>({})
+const initialFormModel: LolmSkin = {
+  id: undefined,
+  skinId: undefined,
+  heroId: undefined,
+  name: undefined,
+  briefIntro: undefined,
+  quality: undefined,
+  couponPrice: undefined,
+  sortWeight: undefined,
+  headIconPic: undefined,
+  card: undefined,
+  poster: undefined
+}
+const formModel = reactive<LolmSkin>({ ...initialFormModel })
 const rules = {
   skinId: [{ required: true, whitespace: true, message: '请输入来源皮肤 ID' }],
   heroId: [{ required: true, whitespace: true, message: '请选择所属英雄' }]
@@ -82,55 +100,33 @@ const rules = {
 const loadHeroes = () => {
   if (heroes.value.length || heroLoading.value) return
   heroLoading.value = true
-  doRequest(pageLolmHero({ current: 1, size: 500, deleted: 0 }), {
-    onSuccess: res => {
-      heroes.value = res.data.records
-    },
-    onFinally: () => {
-      heroLoading.value = false
+  doRequest(
+    pageLolmHero({
+      current: 1,
+      size: LOLM_HERO_SELECT_PAGE_SIZE,
+      deleted: LOLM_CATALOG_STATUS.NOT_DELETED
+    }),
+    {
+      onSuccess: res => {
+        heroes.value = res.data.records
+      },
+      onFinally: () => {
+        heroLoading.value = false
+      }
     }
-  })
+  )
 }
 
-const resetForm = () => {
-  Object.assign(formModel, {
-    id: undefined,
-    skinId: undefined,
-    heroId: undefined,
-    name: undefined,
-    briefIntro: undefined,
-    quality: undefined,
-    couponPrice: undefined,
-    sortWeight: undefined,
-    headIconPic: undefined,
-    card: undefined,
-    poster: undefined
-  })
-  formRef.value?.clearValidate()
-}
-
-const handleSubmit = async () => {
-  try {
-    await formRef.value.validate()
-  } catch {
-    return
-  }
-  submitLoading.value = true
-  const request =
-    formAction.value === FormAction.CREATE
-      ? createLolmSkin({ ...formModel })
-      : updateLolmSkin({ ...formModel })
-  doRequest(request, {
-    successMessage: formAction.value === FormAction.CREATE ? '新增成功' : '保存成功',
-    onSuccess: () => {
-      closeModal()
-      emits('submit-success')
-    },
-    onFinally: () => {
-      submitLoading.value = false
-    }
-  })
-}
+const resetForm = () => resetLolmCatalogForm(formModel, initialFormModel, formRef)
+const handleSubmit = useLolmCatalogFormSubmit({
+  formRef,
+  formAction,
+  submitLoading,
+  create: () => createLolmSkin({ ...formModel }),
+  update: () => updateLolmSkin({ ...formModel }),
+  closeModal,
+  onSuccess: () => emits('submit-success')
+})
 
 defineExpose({
   open(action: FormAction, record?: LolmSkin) {

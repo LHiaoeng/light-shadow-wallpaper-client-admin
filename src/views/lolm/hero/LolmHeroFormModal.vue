@@ -44,8 +44,8 @@
 import { createLolmHero, updateLolmHero } from '@/api/lolmCatalog'
 import type { LolmHero } from '@/api/lolmCatalog/types'
 import { FormAction, useFormAction } from '@/hooks/form'
+import { resetLolmCatalogForm, useLolmCatalogFormSubmit } from '@/hooks/lolmCatalog'
 import { useModal } from '@/hooks/modal'
-import { doRequest } from '@/utils/axios/request'
 import type { ColProps } from 'ant-design-vue'
 
 const labelCol: ColProps = { sm: { span: 24 }, md: { span: 5 } }
@@ -54,49 +54,33 @@ const { title, visible, openModal, closeModal } = useModal()
 const { formAction, isUpdateForm } = useFormAction()
 const formRef = ref()
 const submitLoading = ref(false)
-const formModel = reactive<LolmHero>({})
+const initialFormModel: LolmHero = {
+  id: undefined,
+  heroId: undefined,
+  name: undefined,
+  title: undefined,
+  roles: undefined,
+  lane: undefined,
+  intro: undefined,
+  avatar: undefined,
+  card: undefined,
+  poster: undefined
+}
+const formModel = reactive<LolmHero>({ ...initialFormModel })
 const rules = {
   heroId: [{ required: true, whitespace: true, message: '请输入来源英雄 ID' }]
 }
 
-const resetForm = () => {
-  Object.assign(formModel, {
-    id: undefined,
-    heroId: undefined,
-    name: undefined,
-    title: undefined,
-    roles: undefined,
-    lane: undefined,
-    intro: undefined,
-    avatar: undefined,
-    card: undefined,
-    poster: undefined
-  })
-  formRef.value?.clearValidate()
-}
-
-const handleSubmit = async () => {
-  try {
-    await formRef.value.validate()
-  } catch {
-    return
-  }
-  submitLoading.value = true
-  const request =
-    formAction.value === FormAction.CREATE
-      ? createLolmHero({ ...formModel })
-      : updateLolmHero({ ...formModel })
-  doRequest(request, {
-    successMessage: formAction.value === FormAction.CREATE ? '新增成功' : '保存成功',
-    onSuccess: () => {
-      closeModal()
-      emits('submit-success')
-    },
-    onFinally: () => {
-      submitLoading.value = false
-    }
-  })
-}
+const resetForm = () => resetLolmCatalogForm(formModel, initialFormModel, formRef)
+const handleSubmit = useLolmCatalogFormSubmit({
+  formRef,
+  formAction,
+  submitLoading,
+  create: () => createLolmHero({ ...formModel }),
+  update: () => updateLolmHero({ ...formModel }),
+  closeModal,
+  onSuccess: () => emits('submit-success')
+})
 
 defineExpose({
   open(action: FormAction, record?: LolmHero) {
