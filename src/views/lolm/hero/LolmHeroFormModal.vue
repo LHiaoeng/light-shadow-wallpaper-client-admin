@@ -15,6 +15,9 @@
       <a-form-item label="名称" name="name">
         <a-input v-model:value="formModel.name" />
       </a-form-item>
+      <a-form-item label="别名" name="alias">
+        <a-input v-model:value="formModel.alias" />
+      </a-form-item>
       <a-form-item label="称号" name="title">
         <a-input v-model:value="formModel.title" />
       </a-form-item>
@@ -23,6 +26,24 @@
       </a-form-item>
       <a-form-item label="分路" name="lane">
         <a-input v-model:value="formModel.lane" />
+      </a-form-item>
+      <a-form-item label="难度等级" name="difficultyL">
+        <a-input v-model:value="formModel.difficultyL" />
+      </a-form-item>
+      <a-form-item label="伤害等级" name="damage">
+        <a-input v-model:value="formModel.damage" />
+      </a-form-item>
+      <a-form-item label="生存等级" name="surviveL">
+        <a-input v-model:value="formModel.surviveL" />
+      </a-form-item>
+      <a-form-item label="辅助等级" name="assistL">
+        <a-input v-model:value="formModel.assistL" />
+      </a-form-item>
+      <a-form-item label="标签" name="tags">
+        <a-textarea v-model:value="formModel.tags" :rows="2" />
+      </a-form-item>
+      <a-form-item label="检索词" name="searchkey">
+        <a-textarea v-model:value="formModel.searchkey" :rows="2" />
       </a-form-item>
       <a-form-item label="简介" name="intro">
         <a-textarea v-model:value="formModel.intro" :rows="3" />
@@ -58,9 +79,16 @@ const initialFormModel: LolmHero = {
   id: undefined,
   heroId: undefined,
   name: undefined,
+  alias: undefined,
   title: undefined,
   roles: undefined,
   lane: undefined,
+  difficultyL: undefined,
+  damage: undefined,
+  surviveL: undefined,
+  assistL: undefined,
+  tags: undefined,
+  searchkey: undefined,
   intro: undefined,
   avatar: undefined,
   card: undefined,

@@ -32,11 +32,23 @@
         </a-select>
       </a-form-item>
       <a-form-item label="名称" name="name"><a-input v-model:value="formModel.name" /></a-form-item>
-      <a-form-item label="简介" name="briefIntro">
+      <a-form-item label="背景故事" name="description">
+        <a-textarea v-model:value="formModel.description" :rows="5" />
+      </a-form-item>
+      <a-form-item label="一句话简介" name="briefIntro">
         <a-textarea v-model:value="formModel.briefIntro" :rows="3" />
       </a-form-item>
       <a-form-item label="品质" name="quality"
         ><a-input v-model:value="formModel.quality"
+      /></a-form-item>
+      <a-form-item label="品质图标地址" name="qualityIcon"
+        ><a-input v-model:value="formModel.qualityIcon"
+      /></a-form-item>
+      <a-form-item label="视频地址" name="vedioPath"
+        ><a-input v-model:value="formModel.vedioPath"
+      /></a-form-item>
+      <a-form-item label="特殊称号" name="specialTitle"
+        ><a-input v-model:value="formModel.specialTitle"
       /></a-form-item>
       <a-form-item label="价格" name="couponPrice"
         ><a-input v-model:value="formModel.couponPrice"
@@ -44,6 +56,15 @@
       <a-form-item label="排序权重" name="sortWeight"
         ><a-input v-model:value="formModel.sortWeight"
       /></a-form-item>
+      <a-form-item label="上线时间" name="launchTime">
+        <a-date-picker
+          v-model:value="formModel.launchTime"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          :show-time="true"
+          style="width: 100%"
+        />
+      </a-form-item>
       <a-form-item label="头像图地址" name="headIconPic"
         ><a-input v-model:value="formModel.headIconPic"
       /></a-form-item>
@@ -83,10 +104,15 @@ const initialFormModel: LolmSkin = {
   skinId: undefined,
   heroId: undefined,
   name: undefined,
+  description: undefined,
   briefIntro: undefined,
   quality: undefined,
+  qualityIcon: undefined,
+  vedioPath: undefined,
+  specialTitle: undefined,
   couponPrice: undefined,
   sortWeight: undefined,
+  launchTime: undefined,
   headIconPic: undefined,
   card: undefined,
   poster: undefined

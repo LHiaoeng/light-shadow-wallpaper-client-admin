@@ -4,9 +4,16 @@ export interface LolmHero {
   id?: number
   heroId?: string
   name?: string
+  alias?: string
   title?: string
   roles?: string
   lane?: string
+  difficultyL?: string
+  damage?: string
+  surviveL?: string
+  assistL?: string
+  tags?: string
+  searchkey?: string
   intro?: string
   avatar?: string
   card?: string
@@ -22,10 +29,15 @@ export interface LolmSkin {
   skinId?: string
   heroId?: string
   name?: string
+  description?: string
   briefIntro?: string
   quality?: string
+  qualityIcon?: string
+  vedioPath?: string
+  specialTitle?: string
   couponPrice?: string
   sortWeight?: string
+  launchTime?: string
   headIconPic?: string
   card?: string
   poster?: string

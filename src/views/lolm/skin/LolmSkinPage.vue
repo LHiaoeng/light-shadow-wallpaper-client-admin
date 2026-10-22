@@ -56,7 +56,7 @@
     row-key="id"
     :request="tableRequest"
     :columns="columns"
-    :scroll="{ x: 1550 }"
+    :scroll="{ x: 1900 }"
   >
     <template #toolBarRender>
       <a-space>
@@ -128,15 +128,21 @@
         <a-descriptions-item label="来源皮肤 ID">{{ detail.skinId || '-' }}</a-descriptions-item>
         <a-descriptions-item label="所属英雄 ID">{{ detail.heroId || '-' }}</a-descriptions-item>
         <a-descriptions-item label="名称">{{ detail.name || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="上线时间">{{ detail.launchTime || '-' }}</a-descriptions-item>
         <a-descriptions-item label="品质">{{ detail.quality || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="特殊称号">{{ detail.specialTitle || '-' }}</a-descriptions-item>
         <a-descriptions-item label="价格">{{ detail.couponPrice || '-' }}</a-descriptions-item>
         <a-descriptions-item label="排序权重">{{ detail.sortWeight || '-' }}</a-descriptions-item>
         <a-descriptions-item label="维护方式">{{
           detail.manualMaintained === LOLM_CATALOG_STATUS.MANUAL ? '人工维护' : '自动同步'
         }}</a-descriptions-item>
-        <a-descriptions-item label="简介" :span="2">{{
+        <a-descriptions-item label="背景故事" :span="2">{{
+          detail.description || '-'
+        }}</a-descriptions-item>
+        <a-descriptions-item label="一句话简介" :span="2">{{
           detail.briefIntro || '-'
         }}</a-descriptions-item>
+        <a-descriptions-item label="视频地址" :span="2">{{ detail.vedioPath || '-' }}</a-descriptions-item>
         <a-descriptions-item v-for="[label, url] in detailImages" :key="label" :label="label">
           <a-image v-if="url" :src="url" :width="120" />
           <span v-else>-</span>
@@ -215,6 +221,7 @@ const detailImages = computed(
   () =>
     [
       ['头像图', detail.value?.headIconPic],
+      ['品质图标', detail.value?.qualityIcon],
       ['卡片', detail.value?.card],
       ['海报', detail.value?.poster]
     ] as const
@@ -232,10 +239,11 @@ const columns: ProColumns[] = [
   { title: '皮肤 ID', dataIndex: 'skinId', width: 120 },
   { title: '英雄 ID', dataIndex: 'heroId', width: 100 },
   { title: '名称', dataIndex: 'name', width: 160 },
-  { title: '简介', dataIndex: 'briefIntro', width: 220, ellipsis: true },
+  { title: '背景故事', dataIndex: 'description', width: 300, ellipsis: true },
   { title: '品质', dataIndex: 'quality', width: 100 },
   { title: '价格', dataIndex: 'couponPrice', width: 90 },
   { title: '排序权重', dataIndex: 'sortWeight', width: 110 },
+  { title: '上线时间', dataIndex: 'launchTime', width: 170 },
   { key: 'flags', title: '维护状态', dataIndex: 'manualMaintained', width: 150 },
   { title: '更新时间', dataIndex: 'updateTime', width: 180 },
   { key: 'operate', title: '操作', align: 'center', width: 260, fixed: 'right' }

@@ -132,9 +132,16 @@
       <a-descriptions v-if="detail" bordered :column="2" size="small">
         <a-descriptions-item label="来源英雄 ID">{{ detail.heroId || '-' }}</a-descriptions-item>
         <a-descriptions-item label="名称">{{ detail.name || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="别名">{{ detail.alias || '-' }}</a-descriptions-item>
         <a-descriptions-item label="称号">{{ detail.title || '-' }}</a-descriptions-item>
         <a-descriptions-item label="定位">{{ detail.roles || '-' }}</a-descriptions-item>
         <a-descriptions-item label="分路">{{ detail.lane || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="难度等级">{{ detail.difficultyL || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="伤害等级">{{ detail.damage || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="生存等级">{{ detail.surviveL || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="辅助等级">{{ detail.assistL || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="标签">{{ detail.tags || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="检索词">{{ detail.searchkey || '-' }}</a-descriptions-item>
         <a-descriptions-item label="维护方式">{{
           detail.manualMaintained === LOLM_CATALOG_STATUS.MANUAL ? '人工维护' : '自动同步'
         }}</a-descriptions-item>
