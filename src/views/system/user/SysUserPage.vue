@@ -167,7 +167,7 @@ let searchParams: SysUserQO = {}
 const tableRequest: TableRequest = (params, sorter, filter) => {
   const pageParam = mergePageParam(params, sorter, filter)
   searchParams && (searchParams.organizationId = organizationIds.value)
-  return pageUsers({ ...pageParam, ...searchParams })
+  return pageUsers({ ...pageParam, ...searchParams, type: 1 })
 }
 
 /* 刷新表格 */
