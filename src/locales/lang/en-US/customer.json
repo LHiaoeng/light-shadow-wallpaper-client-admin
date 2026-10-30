@@ -1,0 +1,29 @@
+{
+  "customer": {
+    "title": "Customers",
+    "username": "Username",
+    "usernamePlaceholder": "Enter a username",
+    "nickname": "Nickname",
+    "nicknamePlaceholder": "Enter a nickname",
+    "status": "Status",
+    "statusNormal": "Active",
+    "statusLocked": "Locked",
+    "createTime": "Provisioned at",
+    "createTitle": "Provision a customer",
+    "create": "Create account",
+    "createNotice": "A unique temporary password will be generated and shown once after account creation. Customers receive no admin roles.",
+    "createdTitle": "Customer account created",
+    "deliveryNotice": "Verify the recipient first, then deliver in person or through a verified one-to-one channel. The temporary password cannot be recovered after closing this dialog.",
+    "temporaryPassword": "One-time temporary password",
+    "recipient": "Verified recipient / one-to-one channel",
+    "recipientPlaceholder": "Enter the recipient for the audit record",
+    "clearWithoutDelivery": "Clear password without delivery",
+    "delivered": "Delivered, record audit",
+    "usernameNicknameRequired": "Enter both a username and nickname",
+    "confirmClearTitle": "Clear the password without delivery?",
+    "confirmClearContent": "The temporary password will not be retained or available to view again after closing.",
+    "confirmClear": "Clear and close",
+    "continueViewing": "Continue viewing",
+    "deliverySaved": "Delivery record saved"
+  }
+}

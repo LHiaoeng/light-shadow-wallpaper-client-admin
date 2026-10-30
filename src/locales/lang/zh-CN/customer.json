@@ -1,0 +1,29 @@
+{
+  "customer": {
+    "title": "普通用户",
+    "username": "用户名",
+    "usernamePlaceholder": "请输入用户名",
+    "nickname": "昵称",
+    "nicknamePlaceholder": "请输入昵称",
+    "status": "状态",
+    "statusNormal": "正常",
+    "statusLocked": "已锁定",
+    "createTime": "开通时间",
+    "createTitle": "开通普通用户",
+    "create": "开通账号",
+    "createNotice": "系统会生成独立临时密码，仅在开通后展示一次。普通用户没有后台角色。",
+    "createdTitle": "普通用户已开通",
+    "deliveryNotice": "请先核实接收人，再当面或通过已核验的一对一渠道交付。关闭后临时密码无法找回。",
+    "temporaryPassword": "一次性临时密码",
+    "recipient": "已核实的接收人 / 一对一渠道",
+    "recipientPlaceholder": "填写可用于审计的接收对象",
+    "clearWithoutDelivery": "暂不交付并清除密码",
+    "delivered": "已交付，记录审计",
+    "usernameNicknameRequired": "请填写用户名和昵称",
+    "confirmClearTitle": "暂不交付并清除密码？",
+    "confirmClearContent": "关闭后不会保留临时密码，也无法再次查看。",
+    "confirmClear": "清除并关闭",
+    "continueViewing": "继续查看",
+    "deliverySaved": "交付记录已保存"
+  }
+}
