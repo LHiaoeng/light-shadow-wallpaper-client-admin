@@ -1,0 +1,12 @@
+{
+  "clientLogin": {
+    "title": "Wallpaper account sign-in",
+    "description": "Sign in to your Lively Windows client.",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in and return to Lively",
+    "invalidRequest": "This sign-in request is invalid. Return to Lively and try again.",
+    "invalidCredentials": "The username or password is incorrect.",
+    "requestFailed": "Sign-in failed. Check your connection and try again."
+  }
+}

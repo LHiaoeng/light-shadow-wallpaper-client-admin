@@ -1,0 +1,12 @@
+{
+  "clientLogin": {
+    "title": "壁纸账号登录",
+    "description": "此页面用于 Lively Windows 客户端登录。",
+    "username": "用户名",
+    "password": "密码",
+    "submit": "登录并返回 Lively",
+    "invalidRequest": "登录请求无效，请返回 Lively 重试。",
+    "invalidCredentials": "账号或密码错误，请检查后重试。",
+    "requestFailed": "登录失败，请检查网络后重试。"
+  }
+}

@@ -41,6 +41,15 @@ const constantRoutes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/client/login',
+    name: 'ClientLogin',
+    component: () => import('@/views/client/ClientLogin.vue'),
+    meta: {
+      allowAnonymous: true,
+      withoutLayout: true
+    }
+  },
+  {
     // OAuth2 授权码登录处理页
     path: '/oauth2/consent',
     name: 'OAuth2Consent',
