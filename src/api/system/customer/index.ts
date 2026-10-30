@@ -15,3 +15,15 @@ export function createCustomer(data: { username: string; nickname: string }) {
 export function recordCustomerDelivery(userId: number, data: { recipient: string }) {
   return httpClient.post<ApiResult<void>>(`/system/customer/${userId}/delivery`, data)
 }
+
+export function resetCustomerPassword(userId: number) {
+  return httpClient.post<ApiResult<CustomerCreateResult>>(`/system/customer/${userId}/reset-password`)
+}
+
+export function freezeCustomer(userId: number) {
+  return httpClient.post<ApiResult<void>>(`/system/customer/${userId}/freeze`)
+}
+
+export function unfreezeCustomer(userId: number) {
+  return httpClient.post<ApiResult<void>>(`/system/customer/${userId}/unfreeze`)
+}

@@ -46,6 +46,16 @@
             }}
           </a-tag>
         </template>
+        <template v-else-if="column.key === 'actions' && hasPermission('system:customer:manage')">
+          <a-space>
+            <a-button type="link" size="small" @click="confirmResetPassword(record)">
+              {{ rawI18nText('customer.resetPassword') }}
+            </a-button>
+            <a-button type="link" size="small" @click="confirmStatusChange(record)">
+              {{ record.status === 1 ? rawI18nText('customer.freeze') : rawI18nText('customer.unfreeze') }}
+            </a-button>
+          </a-space>
+        </template>
       </template>
     </pro-table>
   </a-card>
@@ -71,7 +81,7 @@
   </a-modal>
 
   <a-modal
-    :title="rawI18nText('customer.createdTitle')"
+    :title="rawI18nText(resultTitle)"
     :visible="resultVisible"
     :mask-closable="false"
     :footer="null"
@@ -118,8 +128,15 @@
 import ProTable from '#/table'
 import type { ProColumns, ProTableInstanceExpose, TableRequest } from '#/table'
 import { Modal, message } from 'ant-design-vue'
-import { createCustomer, pageCustomers, recordCustomerDelivery } from '@/api/system/customer'
-import type { CustomerPageQuery } from '@/api/system/customer/types'
+import {
+  createCustomer,
+  freezeCustomer,
+  pageCustomers,
+  recordCustomerDelivery,
+  resetCustomerPassword,
+  unfreezeCustomer
+} from '@/api/system/customer'
+import type { CustomerPageQuery, CustomerPageVO } from '@/api/system/customer/types'
 import { useAuthorize } from '@/hooks/permission'
 import { NewButton } from '@/components/Button'
 import { mergePageParam } from '@/utils/page-utils'
@@ -142,6 +159,7 @@ const createdUserId = ref<number>()
 const createdUsername = ref('')
 const temporaryPassword = ref('')
 const recipient = ref('')
+const resultTitle = ref('customer.createdTitle')
 
 const columns: ProColumns[] = [
   { title: rawI18nText('customer.username'), dataIndex: 'username' },
@@ -152,7 +170,8 @@ const columns: ProColumns[] = [
     dataIndex: 'createTime',
     width: 190,
     customRender: ({ value }) => (value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '')
-  }
+  },
+  { title: rawI18nText('customer.actions'), key: 'actions', width: 200 }
 ]
 
 const tableRequest: TableRequest = (params, sorter, filter) => {
@@ -195,12 +214,62 @@ const submitCreate = () => {
       createdUserId.value = response.data.userId
       createdUsername.value = username
       temporaryPassword.value = response.data.temporaryPassword
+      resultTitle.value = 'customer.createdTitle'
       recipient.value = ''
       closeCreate()
       resultVisible.value = true
       reloadTable(true)
     },
     onFinally: () => (createLoading.value = false)
+  })
+}
+
+const confirmResetPassword = (record: CustomerPageVO) => {
+  Modal.confirm({
+    title: rawI18nText('customer.resetPasswordTitle'),
+    content: rawI18nText('customer.resetPasswordNotice'),
+    okText: rawI18nText('customer.resetPassword'),
+    cancelText: rawI18nText('customer.cancel'),
+    onOk: () =>
+      new Promise<void>((resolve, reject) => {
+        doRequest(resetCustomerPassword(record.userId), {
+          successMessage: false,
+          onSuccess: response => {
+            createdUserId.value = response.data.userId
+            createdUsername.value = record.username
+            temporaryPassword.value = response.data.temporaryPassword
+            resultTitle.value = 'customer.resetPasswordResultTitle'
+            recipient.value = ''
+            resultVisible.value = true
+            resolve()
+          },
+          onFail: () => reject(new Error()),
+          onError: reject
+        })
+      })
+  })
+}
+
+const confirmStatusChange = (record: CustomerPageVO) => {
+  const freeze = record.status === 1
+  Modal.confirm({
+    title: rawI18nText(freeze ? 'customer.freezeTitle' : 'customer.unfreezeTitle'),
+    content: rawI18nText(freeze ? 'customer.freezeNotice' : 'customer.unfreezeNotice'),
+    okText: rawI18nText(freeze ? 'customer.freeze' : 'customer.unfreeze'),
+    cancelText: rawI18nText('customer.cancel'),
+    onOk: () =>
+      new Promise<void>((resolve, reject) => {
+        doRequest((freeze ? freezeCustomer(record.userId) : unfreezeCustomer(record.userId)), {
+          successMessage: false,
+          onSuccess: () => {
+            message.success(rawI18nText(freeze ? 'customer.frozen' : 'customer.unfrozen'))
+            reloadTable()
+            resolve()
+          },
+          onFail: () => reject(new Error()),
+          onError: reject
+        })
+      })
   })
 }
 

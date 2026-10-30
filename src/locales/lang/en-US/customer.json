@@ -24,6 +24,20 @@
     "confirmClearContent": "The temporary password will not be retained or available to view again after closing.",
     "confirmClear": "Clear and close",
     "continueViewing": "Continue viewing",
-    "deliverySaved": "Delivery record saved"
+    "deliverySaved": "Delivery record saved",
+    "actions": "Security actions",
+    "resetPassword": "Reset password",
+    "resetPasswordTitle": "Reset this customer password?",
+    "resetPasswordNotice": "The current password will stop working. The customer must change the new temporary password at next sign-in.",
+    "resetPasswordResultTitle": "Temporary password reset",
+    "freeze": "Freeze",
+    "unfreeze": "Unfreeze",
+    "freezeTitle": "Freeze this customer?",
+    "unfreezeTitle": "Unfreeze this customer?",
+    "freezeNotice": "Freezing immediately revokes every device authorization for this customer.",
+    "unfreezeNotice": "Unfreezing does not restore old authorizations. The customer must sign in again.",
+    "frozen": "Account frozen; old authorizations revoked",
+    "unfrozen": "Account unfrozen; sign-in required",
+    "cancel": "Cancel"
   }
 }

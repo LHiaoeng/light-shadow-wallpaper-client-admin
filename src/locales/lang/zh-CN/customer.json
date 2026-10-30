@@ -24,6 +24,20 @@
     "confirmClearContent": "关闭后不会保留临时密码，也无法再次查看。",
     "confirmClear": "清除并关闭",
     "continueViewing": "继续查看",
-    "deliverySaved": "交付记录已保存"
+    "deliverySaved": "交付记录已保存",
+    "actions": "安全操作",
+    "resetPassword": "重置密码",
+    "resetPasswordTitle": "重置普通用户密码？",
+    "resetPasswordNotice": "当前密码将失效，并要求用户下次登录时修改新生成的临时密码。",
+    "resetPasswordResultTitle": "临时密码已重置",
+    "freeze": "冻结",
+    "unfreeze": "解冻",
+    "freezeTitle": "冻结普通用户？",
+    "unfreezeTitle": "解冻普通用户？",
+    "freezeNotice": "冻结会立即撤销该用户的所有设备授权。",
+    "unfreezeNotice": "解冻不会恢复旧授权，用户需要重新登录。",
+    "frozen": "账号已冻结，旧授权已撤销",
+    "unfrozen": "账号已解冻，需重新登录",
+    "cancel": "取消"
   }
 }
