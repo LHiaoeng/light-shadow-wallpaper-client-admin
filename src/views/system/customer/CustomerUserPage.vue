@@ -109,40 +109,25 @@
     :visible="resultVisible"
     :mask-closable="false"
     :footer="null"
-    @cancel="confirmClearResult"
+    @cancel="clearResult"
   >
     <a-alert
-      :message="rawI18nText('customer.deliveryNotice')"
-      type="warning"
+      :message="rawI18nText('customer.resultNotice')"
+      type="info"
       show-icon
       style="margin-bottom: 20px"
     />
     <a-form layout="vertical">
       <a-form-item :label="rawI18nText('customer.username')">
-        <a-input :value="createdUsername" readonly />
+        <a-typography-text copyable>{{ createdUsername }}</a-typography-text>
       </a-form-item>
       <a-form-item :label="rawI18nText('customer.password')">
-        <a-input :value="deliveryPassword" readonly autocomplete="off" />
-      </a-form-item>
-      <a-form-item :label="rawI18nText('customer.recipient')" required>
-        <a-input
-          v-model:value="recipient"
-          maxlength="255"
-          :placeholder="rawI18nText('customer.recipientPlaceholder')"
-        />
+        <a-typography-text copyable>{{ resultPassword }}</a-typography-text>
       </a-form-item>
     </a-form>
     <div class="result-actions">
-      <a-button @click="confirmClearResult">{{
-        rawI18nText('customer.clearWithoutDelivery')
-      }}</a-button>
-      <a-button
-        type="primary"
-        :loading="deliveryLoading"
-        :disabled="!recipient.trim()"
-        @click="submitDelivery"
-      >
-        {{ rawI18nText('customer.delivered') }}
+      <a-button type="primary" @click="clearResult">
+        {{ rawI18nText('customer.close') }}
       </a-button>
     </div>
   </a-modal>
@@ -156,7 +141,6 @@ import {
   createCustomer,
   freezeCustomer,
   pageCustomers,
-  recordCustomerDelivery,
   resetCustomerPassword,
   unfreezeCustomer
 } from '@/api/system/customer'
@@ -183,11 +167,8 @@ const resetLoading = ref(false)
 const resetTarget = ref<CustomerPageVO>()
 const resetPassword = ref('123456')
 const resultVisible = ref(false)
-const deliveryLoading = ref(false)
-const createdUserId = ref<number>()
 const createdUsername = ref('')
-const deliveryPassword = ref('')
-const recipient = ref('')
+const resultPassword = ref('')
 const resultTitle = ref('customer.createdTitle')
 
 const columns: ProColumns[] = [
@@ -242,12 +223,10 @@ const submitCreate = () => {
   createLoading.value = true
   doRequest(createCustomer({ username, nickname, password: passEncrypt(password) }), {
     successMessage: false,
-    onSuccess: response => {
-      createdUserId.value = response.data.userId
+    onSuccess: () => {
       createdUsername.value = username
-      deliveryPassword.value = password
+      resultPassword.value = password
       resultTitle.value = 'customer.createdTitle'
-      recipient.value = ''
       closeCreate()
       resultVisible.value = true
       reloadTable(true)
@@ -278,12 +257,10 @@ const submitResetPassword = () => {
   resetLoading.value = true
   doRequest(resetCustomerPassword(target.userId, { password: passEncrypt(password) }), {
     successMessage: false,
-    onSuccess: response => {
-      createdUserId.value = response.data.userId
+    onSuccess: () => {
       createdUsername.value = target.username
-      deliveryPassword.value = password
+      resultPassword.value = password
       resultTitle.value = 'customer.resetPasswordResultTitle'
-      recipient.value = ''
       closeResetPassword()
       resultVisible.value = true
     },
@@ -316,40 +293,14 @@ const confirmStatusChange = (record: CustomerPageVO) => {
 
 const clearResult = () => {
   resultVisible.value = false
-  createdUserId.value = undefined
   createdUsername.value = ''
-  deliveryPassword.value = ''
-  recipient.value = ''
-}
-
-const confirmClearResult = () => {
-  Modal.confirm({
-    title: rawI18nText('customer.confirmClearTitle'),
-    content: rawI18nText('customer.confirmClearContent'),
-    okText: rawI18nText('customer.confirmClear'),
-    cancelText: rawI18nText('customer.continueViewing'),
-    onOk: clearResult
-  })
-}
-
-const submitDelivery = () => {
-  if (!createdUserId.value || !recipient.value.trim()) return
-  deliveryLoading.value = true
-  doRequest(recordCustomerDelivery(createdUserId.value, { recipient: recipient.value.trim() }), {
-    successMessage: false,
-    onSuccess: () => {
-      message.success(rawI18nText('customer.deliverySaved'))
-      clearResult()
-    },
-    onFinally: () => (deliveryLoading.value = false)
-  })
+  resultPassword.value = ''
 }
 </script>
 
 <style scoped>
 .result-actions {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: flex-end;
 }
 </style>

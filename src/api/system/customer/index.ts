@@ -15,10 +15,6 @@ export function createCustomer(data: { username: string; nickname: string; passw
   return httpClient.post<ApiResult<CustomerCreateResult>>('/system/customer', data)
 }
 
-export function recordCustomerDelivery(userId: number, data: { recipient: string }) {
-  return httpClient.post<ApiResult<void>>(`/system/customer/${userId}/delivery`, data)
-}
-
 export function resetCustomerPassword(userId: number, data: { password: string }) {
   return httpClient.post<ApiResult<CustomerCreateResult>>(
     `/system/customer/${userId}/reset-password`,
