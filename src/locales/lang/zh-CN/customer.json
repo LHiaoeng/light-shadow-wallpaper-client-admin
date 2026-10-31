@@ -17,6 +17,7 @@
     "password": "密码",
     "passwordRequired": "请填写密码",
     "createRequired": "请填写用户名、昵称和密码",
+    "copyCredentials": "复制账号和密码",
     "close": "关闭",
     "actions": "安全操作",
     "resetPassword": "重置密码",

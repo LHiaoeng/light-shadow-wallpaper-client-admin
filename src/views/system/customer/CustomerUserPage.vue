@@ -119,13 +119,16 @@
     />
     <a-form layout="vertical">
       <a-form-item :label="rawI18nText('customer.username')">
-        <a-typography-text copyable>{{ createdUsername }}</a-typography-text>
+        <a-typography-text>{{ createdUsername }}</a-typography-text>
       </a-form-item>
       <a-form-item :label="rawI18nText('customer.password')">
-        <a-typography-text copyable>{{ resultPassword }}</a-typography-text>
+        <a-typography-text>{{ resultPassword }}</a-typography-text>
       </a-form-item>
     </a-form>
     <div class="result-actions">
+      <a-typography-text :copyable="{ text: credentialsToCopy }">
+        {{ rawI18nText('customer.copyCredentials') }}
+      </a-typography-text>
       <a-button type="primary" @click="clearResult">
         {{ rawI18nText('customer.close') }}
       </a-button>
@@ -170,6 +173,11 @@ const resultVisible = ref(false)
 const createdUsername = ref('')
 const resultPassword = ref('')
 const resultTitle = ref('customer.createdTitle')
+const credentialsToCopy = computed(
+  () =>
+    `${rawI18nText('customer.username')}: ${createdUsername.value}\n` +
+    `${rawI18nText('customer.password')}: ${resultPassword.value}`
+)
 
 const columns: ProColumns[] = [
   { title: rawI18nText('customer.username'), dataIndex: 'username' },
@@ -301,6 +309,7 @@ const clearResult = () => {
 <style scoped>
 .result-actions {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
 }
 </style>

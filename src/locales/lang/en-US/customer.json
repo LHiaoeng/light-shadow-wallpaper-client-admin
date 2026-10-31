@@ -17,6 +17,7 @@
     "password": "Password",
     "passwordRequired": "Enter a password",
     "createRequired": "Enter a username, nickname and password",
+    "copyCredentials": "Copy username and password",
     "close": "Close",
     "actions": "Security actions",
     "resetPassword": "Reset password",
