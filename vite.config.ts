@@ -10,8 +10,6 @@ import AutoImport from 'unplugin-auto-import/vite'
 // 按需加载 ant-design-vue 此组件无法处理非组件模块，如 message、notification
 import Components from 'unplugin-vue-components/vite'
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
-// 修改 index.html 插件
-import { createHtmlPlugin } from 'vite-plugin-html'
 // vue i18n 处理
 import VueI18n from '@intlify/unplugin-vue-i18n/vite'
 
@@ -26,7 +24,7 @@ const serverAddress = 'http://127.0.0.1:9527'
 export default defineConfig({
   server: {
     proxy: {
-      '^/api': {
+      '/api': {
         target: serverAddress,
         changeOrigin: true,
         ws: true,
@@ -80,15 +78,13 @@ export default defineConfig({
       dts: './types/components.d.ts'
     }),
 
-    createHtmlPlugin({
-      minify: false,
-      // 注入变量
-      inject: {
-        data: {
-          title: projectTitle
-        }
+    {
+      name: 'html-title',
+      transformIndexHtml: {
+        enforce: 'pre',
+        transform: html => html.replace(/<%- title %>/g, projectTitle)
       }
-    }),
+    },
 
     VueI18n({
       runtimeOnly: true,
