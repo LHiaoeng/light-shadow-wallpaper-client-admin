@@ -15,5 +15,4 @@ export type CustomerPageVO = {
 
 export type CustomerCreateResult = {
   userId: number
-  temporaryPassword: string
 }

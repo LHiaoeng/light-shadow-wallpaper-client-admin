@@ -52,7 +52,11 @@
               {{ rawI18nText('customer.resetPassword') }}
             </a-button>
             <a-button type="link" size="small" @click="confirmStatusChange(record)">
-              {{ record.status === 1 ? rawI18nText('customer.freeze') : rawI18nText('customer.unfreeze') }}
+              {{
+                record.status === 1
+                  ? rawI18nText('customer.freeze')
+                  : rawI18nText('customer.unfreeze')
+              }}
             </a-button>
           </a-space>
         </template>
@@ -76,7 +80,27 @@
       <a-form-item :label="rawI18nText('customer.nickname')" required>
         <a-input v-model:value="createForm.nickname" maxlength="64" autocomplete="off" />
       </a-form-item>
+      <a-form-item :label="rawI18nText('customer.password')" required>
+        <a-input-password v-model:value="createForm.password" autocomplete="new-password" />
+      </a-form-item>
       <a-alert :message="rawI18nText('customer.createNotice')" type="info" show-icon />
+    </a-form>
+  </a-modal>
+
+  <a-modal
+    :title="rawI18nText('customer.resetPasswordTitle')"
+    :visible="resetVisible"
+    :confirm-loading="resetLoading"
+    :mask-closable="false"
+    :ok-text="rawI18nText('customer.resetPassword')"
+    @ok="submitResetPassword"
+    @cancel="closeResetPassword"
+  >
+    <a-form layout="vertical">
+      <a-form-item :label="rawI18nText('customer.password')" required>
+        <a-input-password v-model:value="resetPassword" autocomplete="new-password" />
+      </a-form-item>
+      <a-alert :message="rawI18nText('customer.resetPasswordNotice')" type="info" show-icon />
     </a-form>
   </a-modal>
 
@@ -97,8 +121,8 @@
       <a-form-item :label="rawI18nText('customer.username')">
         <a-input :value="createdUsername" readonly />
       </a-form-item>
-      <a-form-item :label="rawI18nText('customer.temporaryPassword')">
-        <a-input :value="temporaryPassword" readonly autocomplete="off" />
+      <a-form-item :label="rawI18nText('customer.password')">
+        <a-input :value="deliveryPassword" readonly autocomplete="off" />
       </a-form-item>
       <a-form-item :label="rawI18nText('customer.recipient')" required>
         <a-input
@@ -143,6 +167,7 @@ import { mergePageParam } from '@/utils/page-utils'
 import { doRequest } from '@/utils/axios/request'
 import { useAdminI18n } from '@/hooks/i18n'
 import dayjs from 'dayjs'
+import { passEncrypt } from '@/utils/password-utils'
 
 defineOptions({ name: 'CustomerUserPage' })
 
@@ -150,14 +175,18 @@ const { hasPermission } = useAuthorize()
 const { rawI18nText } = useAdminI18n()
 const tableRef = ref<ProTableInstanceExpose>()
 const searchParams = reactive<CustomerPageQuery>({ username: '', nickname: '' })
-const createForm = reactive({ username: '', nickname: '' })
+const createForm = reactive({ username: '', nickname: '', password: '123456' })
 const createVisible = ref(false)
 const createLoading = ref(false)
+const resetVisible = ref(false)
+const resetLoading = ref(false)
+const resetTarget = ref<CustomerPageVO>()
+const resetPassword = ref('123456')
 const resultVisible = ref(false)
 const deliveryLoading = ref(false)
 const createdUserId = ref<number>()
 const createdUsername = ref('')
-const temporaryPassword = ref('')
+const deliveryPassword = ref('')
 const recipient = ref('')
 const resultTitle = ref('customer.createdTitle')
 
@@ -191,6 +220,7 @@ const resetSearch = () => {
 const openCreate = () => {
   createForm.username = ''
   createForm.nickname = ''
+  createForm.password = '123456'
   createVisible.value = true
 }
 
@@ -198,22 +228,24 @@ const closeCreate = () => {
   createVisible.value = false
   createForm.username = ''
   createForm.nickname = ''
+  createForm.password = '123456'
 }
 
 const submitCreate = () => {
   const username = createForm.username.trim()
   const nickname = createForm.nickname.trim()
-  if (!username || !nickname) {
-    message.warning(rawI18nText('customer.usernameNicknameRequired'))
+  const password = createForm.password
+  if (!username || !nickname || !password) {
+    message.warning(rawI18nText('customer.createRequired'))
     return
   }
   createLoading.value = true
-  doRequest(createCustomer({ username, nickname }), {
+  doRequest(createCustomer({ username, nickname, password: passEncrypt(password) }), {
     successMessage: false,
     onSuccess: response => {
       createdUserId.value = response.data.userId
       createdUsername.value = username
-      temporaryPassword.value = response.data.temporaryPassword
+      deliveryPassword.value = password
       resultTitle.value = 'customer.createdTitle'
       recipient.value = ''
       closeCreate()
@@ -225,28 +257,37 @@ const submitCreate = () => {
 }
 
 const confirmResetPassword = (record: CustomerPageVO) => {
-  Modal.confirm({
-    title: rawI18nText('customer.resetPasswordTitle'),
-    content: rawI18nText('customer.resetPasswordNotice'),
-    okText: rawI18nText('customer.resetPassword'),
-    cancelText: rawI18nText('customer.cancel'),
-    onOk: () =>
-      new Promise<void>((resolve, reject) => {
-        doRequest(resetCustomerPassword(record.userId), {
-          successMessage: false,
-          onSuccess: response => {
-            createdUserId.value = response.data.userId
-            createdUsername.value = record.username
-            temporaryPassword.value = response.data.temporaryPassword
-            resultTitle.value = 'customer.resetPasswordResultTitle'
-            recipient.value = ''
-            resultVisible.value = true
-            resolve()
-          },
-          onFail: () => reject(new Error()),
-          onError: reject
-        })
-      })
+  resetTarget.value = record
+  resetPassword.value = '123456'
+  resetVisible.value = true
+}
+
+const closeResetPassword = () => {
+  resetVisible.value = false
+  resetTarget.value = undefined
+  resetPassword.value = ''
+}
+
+const submitResetPassword = () => {
+  const target = resetTarget.value
+  const password = resetPassword.value
+  if (!target || !password) {
+    message.warning(rawI18nText('customer.passwordRequired'))
+    return
+  }
+  resetLoading.value = true
+  doRequest(resetCustomerPassword(target.userId, { password: passEncrypt(password) }), {
+    successMessage: false,
+    onSuccess: response => {
+      createdUserId.value = response.data.userId
+      createdUsername.value = target.username
+      deliveryPassword.value = password
+      resultTitle.value = 'customer.resetPasswordResultTitle'
+      recipient.value = ''
+      closeResetPassword()
+      resultVisible.value = true
+    },
+    onFinally: () => (resetLoading.value = false)
   })
 }
 
@@ -259,7 +300,7 @@ const confirmStatusChange = (record: CustomerPageVO) => {
     cancelText: rawI18nText('customer.cancel'),
     onOk: () =>
       new Promise<void>((resolve, reject) => {
-        doRequest((freeze ? freezeCustomer(record.userId) : unfreezeCustomer(record.userId)), {
+        doRequest(freeze ? freezeCustomer(record.userId) : unfreezeCustomer(record.userId), {
           successMessage: false,
           onSuccess: () => {
             message.success(rawI18nText(freeze ? 'customer.frozen' : 'customer.unfrozen'))
@@ -277,7 +318,7 @@ const clearResult = () => {
   resultVisible.value = false
   createdUserId.value = undefined
   createdUsername.value = ''
-  temporaryPassword.value = ''
+  deliveryPassword.value = ''
   recipient.value = ''
 }
 
