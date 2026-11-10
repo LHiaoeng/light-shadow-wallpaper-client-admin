@@ -19,36 +19,37 @@ watch(fileInfo, newValue => {
   emits('update:fileInfo', newValue)
 })
 
-/**
- * 判断 `@` 是否为项目约定的「地址@缩略图」分隔符。
- * 部分站点（如 b站）把 `@` 用作图片格式参数后缀，如 xxx.jpg@1052w_!web-dynamic.avif，
- * 这种情况下 `@` 后面不是完整地址，应属于 url 本身，不能截断。
- */
-function isPosterSeparator(url: string): boolean {
-  const atIndex = url.indexOf('@')
-  if (atIndex === -1) return false
+/** 按「图片地址@处理参数」提取原图，不限制图床域名。 */
+function getCleanUrl(input: string): string {
+  let parsed: URL
+  try {
+    parsed = new URL(input.startsWith('//') ? `https:${input}` : input)
+  } catch {
+    return input
+  }
+  if (!/^https?:$/.test(parsed.protocol)) return input
 
-  const after = url.substring(atIndex + 1).trim()
-  // 缩略图一定是完整地址；格式参数只是后缀片段
-  return /^(https?:)?\/\//i.test(after)
-}
+  // 签名可能包含处理参数或路径，修改后会导致鉴权失败。
+  if (
+    [...parsed.searchParams.keys()].some(key =>
+      /sign|token|auth|^expires$|^e$|^x-amz-|^x-oss-/i.test(key)
+    )
+  ) {
+    return input
+  }
 
-function getCleanUrl(url: string): string {
-  if (!isPosterSeparator(url)) return url
-
-  // 查找 "@" 字符的位置
-  const atIndex = url.indexOf('@')
-
-  // 如果找到 "@"，返回去掉格式的 URL；否则返回原 URL
-  return atIndex !== -1 ? url.substring(0, atIndex) : url
+  const suffixIndex = input.search(/[?#]/)
+  const base = suffixIndex < 0 ? input : input.slice(0, suffixIndex)
+  const suffix = suffixIndex < 0 ? '' : input.slice(suffixIndex)
+  if (!/@[^/]+$/.test(parsed.pathname)) return input
+  return base.replace(/@[^/]+$/, '') + suffix
 }
 
 const addFileUrl = () => {
-  if (!fileUrl.value) return
-  fileInfo.value = {
-    url: getCleanUrl(fileUrl.value),
-    poster: isPosterSeparator(fileUrl.value) ? fileUrl.value : ''
-  }
+  const input = fileUrl.value.trim()
+  if (!input) return
+  const url = getCleanUrl(input)
+  fileInfo.value = { url, poster: url === input ? '' : input }
 }
 
 /** 从 text/html 中解析出图片地址 */
@@ -198,7 +199,7 @@ defineExpose({
           :rows="2"
         />
         <div class="file-analyzer-tip">
-          支持「地址@缩略图地址」格式指定封面，仅填地址则不设置封面
+          支持「图片地址@处理参数」格式，自动提取原图并保留完整地址作为缩略图
         </div>
       </a-form-item>
       <a-form-item>
